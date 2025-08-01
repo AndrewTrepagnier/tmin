@@ -1,0 +1,21 @@
+# TMIN Pipe Configuration Example
+# Save this as pipe_config.toml and use: tmin -f pipe_config.toml -t 0.060
+
+# Required parameters
+schedule = "40"
+nps = "2"
+pressure = 50.0
+pressure_class = 150
+metallurgy = "Intermediate/Low CS"
+allowable_stress = 23333.0  # 35000 * 2/3 for A106 GR B
+
+# Optional parameters with defaults
+design_temp = "900"
+pipe_config = "straight"
+corrosion_rate = 10.0  # MPY
+default_retirement_limit = 0.050  # inches
+api_table = "2025"
+year_inspected = 2023
+
+# Note: measured_thickness must be provided on command line
+# Example: tmin -f pipe_config.toml -t 0.060 
