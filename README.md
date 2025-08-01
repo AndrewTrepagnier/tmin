@@ -1,4 +1,4 @@
-# TMIN
+# TMIN - Under development
 [![PyPI downloads](https://img.shields.io/pypi/dm/tmin.svg)](https://pypi.org/project/tmin/)
 ![License](https://img.shields.io/pypi/l/tmin)    
 [![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
