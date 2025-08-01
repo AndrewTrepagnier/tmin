@@ -1,0 +1,2 @@
+[console_scripts]
+tmin = tmin.cli:main

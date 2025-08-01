@@ -1,0 +1,60 @@
+
+TMIN - PIPE THICKNESS ANALYSIS REPORT
+=====================================
+
+Report Generated: 2025-07-22 06:52:56
+Analysis ID: TMIN_20250722_065256
+
+PIPE SPECIFICATIONS
+-------------------
+Nominal Pipe Size (NPS): 3/4
+Schedule: 160
+Pressure Class: 300
+Metallurgy: Intermediate/Low CS
+Design Pressure: 251.0 psi
+Pipe Configuration: straight
+Corrosion Rate: Not specified mpy
+
+THICKNESS MEASUREMENT DATA
+--------------------------
+Measured Thickness: 0.1490 inches
+Inspection Year: None
+Present-Day Thickness: 0.1490 inches
+
+DESIGN REQUIREMENTS
+-------------------
+Pressure Design Minimum: 0.0085 inches
+Structural Minimum (API 574): 0.0700 inches
+Governing Thickness: 0.0700 inches
+Governing Factor: structural
+
+RETIREMENT LIMITS
+-----------------
+Retirement Limit: N/A
+API 574 Retirement Limit: 0.0700 inches
+
+THICKNESS ANALYSIS
+------------------
+Pressure Design Adequacy: ADEQUATE
+Structural Adequacy: ADEQUATE
+Retirement Status: NO DATA AVAILABLE
+API 574 Status: ABOVE RETIREMENT LIMIT
+
+CORROSION ALLOWANCE
+-------------------
+Above API 574 RL: 0.07899999999999999 inches
+Below Retirement Limit: None inches
+Estimated Life Span: None years
+
+RECOMMENDATIONS
+---------------
+• Pipe thickness is adequate for current service conditions
+• Continue with normal inspection schedule
+
+NOTES
+-----
+• Analysis based on ASME B31.1 pressure design equations
+• Structural requirements from API 574 Table D.2
+• Y-coefficient used: 0.4
+• No corrosion rate specified - life span calculation not performed
+• Governing factor for design: structural

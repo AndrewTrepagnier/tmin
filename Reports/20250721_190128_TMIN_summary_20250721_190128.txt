@@ -1,0 +1,27 @@
+
+TMIN SUMMARY REPORT
+===================
+
+Pipe Specifications:
+NPS: 2" Schedule 40
+Pressure Class: 150
+Metallurgy: Intermediate/Low CS
+Design Pressure: 50.0 psi
+
+Thickness Analysis:
+Actual Thickness: 0.0400 inches
+Governing Thickness: 0.0500 inches
+Governing Factor: structural
+
+Status: INADEQUATE
+
+Key Findings:
+• Below structural minimum
+• Below API 574 retirement limit
+• Below retirement limit
+
+Recommendations:
+• Immediate action required
+• Consider pipe replacement or pressure reduction
+
+Report Generated: 2025-07-21 19:01:28
