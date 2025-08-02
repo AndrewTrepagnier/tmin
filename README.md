@@ -1,12 +1,18 @@
 # TMIN - Under development
-[![PyPI downloads](https://img.shields.io/pypi/dm/tmin.svg)](https://pypi.org/project/tmin/)
+[![Downloads](https://pepy.tech/badge/tmin)](https://pepy.tech/project/tmin)
 ![License](https://img.shields.io/pypi/l/tmin)    
 [![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
 ![Python](https://img.shields.io/pypi/pyversions/tmin)
 
-**The 5-minute pipe thickness analysis tool that tells you if your process pipe is safe to operate.**
+**The rapid pipe thickness analysis tool that tells you if your process pipe is safe to operate.**
 
 All process pipes corrode over time, this package helps determine whether the pipe has structural/pressure integrity and is ASME/API-compliant, all with one python function.
+
+In your terminal, download the package via: 
+
+```bash
+pip install tmin
+```
 
 ---
 ## You have an inspection report. Now what?
