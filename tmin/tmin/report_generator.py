@@ -337,3 +337,253 @@ Report Generated: {timestamp}
             f.write(summary_content)
         
         return filepath 
+    
+    def generate_csv_report(self, pipe_instance, analysis_results: Dict[str, Any], 
+                           filename: Optional[str] = None) -> str:
+        """
+        Generate a CSV report with analysis data
+        
+        Args:
+            pipe_instance: PIPE instance
+            analysis_results: Results from analysis method
+            filename: Optional filename to save the report (without extension)
+            
+        Returns:
+            str: Path to saved CSV file
+        """
+        import csv
+        
+        if filename is None:
+            filename = f"TMIN_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        filepath = self._get_filename_with_date(f"{filename}.csv")
+        
+        # Prepare data for CSV
+        csv_data = [
+            # Pipe specifications
+            ["Category", "Parameter", "Value", "Units"],
+            ["Pipe Specs", "NPS", pipe_instance.nps, "inches"],
+            ["Pipe Specs", "Schedule", pipe_instance.schedule, ""],
+            ["Pipe Specs", "Pressure Class", pipe_instance.pressure_class, ""],
+            ["Pipe Specs", "Metallurgy", pipe_instance.metallurgy, ""],
+            ["Pipe Specs", "Design Pressure", pipe_instance.pressure, "psi"],
+            ["Pipe Specs", "Design Temperature", pipe_instance.design_temp, "°F"],
+            ["Pipe Specs", "Pipe Configuration", pipe_instance.pipe_config, ""],
+            ["Pipe Specs", "Corrosion Rate", pipe_instance.corrosion_rate or "N/A", "MPY"],
+            
+            # Analysis results
+            ["Analysis", "Flag", analysis_results.get('flag', 'N/A'), ""],
+            ["Analysis", "Status", analysis_results.get('status', 'N/A'), ""],
+            ["Analysis", "Measured Thickness", analysis_results.get('measured_thickness', 0), "inches"],
+            ["Analysis", "Actual Thickness", analysis_results.get('actual_thickness', 0), "inches"],
+            ["Analysis", "Pressure Minimum", analysis_results.get('tmin_pressure', 0), "inches"],
+            ["Analysis", "Structural Minimum", analysis_results.get('tmin_structural', 0), "inches"],
+            ["Analysis", "Governing Thickness", analysis_results.get('governing_thickness', 0), "inches"],
+            ["Analysis", "Governing Type", analysis_results.get('governing_type', 'N/A'), ""],
+            
+            # Retirement limits
+            ["Retirement", "Default Retirement Limit", analysis_results.get('default_retirement_limit', 'N/A'), "inches"],
+            ["Retirement", "API 574 RL", analysis_results.get('api574_RL', 0), "inches"],
+            ["Retirement", "Corrosion Allowance", analysis_results.get('corrosion_allowance', 'N/A'), "inches"],
+            ["Retirement", "Remaining Life", analysis_results.get('remaining_life_years', 'N/A'), "years"],
+            
+            # Additional data
+            ["Metadata", "Report Generated", datetime.now().strftime("%Y-%m-%d %H:%M:%S"), ""],
+            ["Metadata", "API Table Version", pipe_instance.API_table, ""],
+        ]
+        
+        # Write CSV file
+        with open(filepath, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(csv_data)
+        
+        return filepath
+    
+    def generate_json_report(self, pipe_instance, analysis_results: Dict[str, Any], 
+                            filename: Optional[str] = None) -> str:
+        """
+        Generate a JSON report with analysis data
+        
+        Args:
+            pipe_instance: PIPE instance
+            analysis_results: Results from analysis method
+            filename: Optional filename to save the report (without extension)
+            
+        Returns:
+            str: Path to saved JSON file
+        """
+        import json
+        
+        if filename is None:
+            filename = f"TMIN_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        filepath = self._get_filename_with_date(f"{filename}.json")
+        
+        # Prepare JSON data structure
+        json_data = {
+            "metadata": {
+                "report_generated": datetime.now().isoformat(),
+                "api_table_version": pipe_instance.API_table,
+                "analysis_id": f"TMIN_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            },
+            "pipe_specifications": {
+                "nps": pipe_instance.nps,
+                "schedule": pipe_instance.schedule,
+                "pressure_class": pipe_instance.pressure_class,
+                "metallurgy": pipe_instance.metallurgy,
+                "design_pressure": pipe_instance.pressure,
+                "design_temperature": pipe_instance.design_temp,
+                "pipe_configuration": pipe_instance.pipe_config,
+                "corrosion_rate": pipe_instance.corrosion_rate,
+                "yield_stress": pipe_instance.yield_stress
+            },
+            "analysis_results": analysis_results,
+            "thickness_requirements": {
+                "pressure_minimum": analysis_results.get('tmin_pressure', 0),
+                "structural_minimum": analysis_results.get('tmin_structural', 0),
+                "governing_thickness": analysis_results.get('governing_thickness', 0),
+                "governing_type": analysis_results.get('governing_type', 'N/A')
+            },
+            "retirement_limits": {
+                "default_retirement_limit": analysis_results.get('default_retirement_limit'),
+                "api574_retirement_limit": analysis_results.get('api574_RL', 0),
+                "corrosion_allowance": analysis_results.get('corrosion_allowance'),
+                "remaining_life_years": analysis_results.get('remaining_life_years')
+            },
+            "assessment": {
+                "flag": analysis_results.get('flag', 'N/A'),
+                "status": analysis_results.get('status', 'N/A'),
+                "message": analysis_results.get('message', 'N/A')
+            }
+        }
+        
+        # Write JSON file
+        with open(filepath, 'w') as f:
+            json.dump(json_data, f, indent=2, default=str)
+        
+        return filepath
+    
+    def generate_notebook_report(self, pipe_instance, analysis_results: Dict[str, Any], 
+                                filename: Optional[str] = None) -> str:
+        """
+        Generate a Jupyter notebook report with analysis data and visualizations
+        
+        Args:
+            pipe_instance: PIPE instance
+            analysis_results: Results from analysis method
+            filename: Optional filename to save the report (without extension)
+            
+        Returns:
+            str: Path to saved notebook file
+        """
+        import nbformat as nbf
+        
+        if filename is None:
+            filename = f"TMIN_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        filepath = self._get_filename_with_date(f"{filename}.ipynb")
+        
+        # Create notebook
+        nb = nbf.v4.new_notebook()
+        
+        # Title cell
+        title_cell = nbf.v4.new_markdown_cell(f"""# TMIN Pipe Thickness Analysis Report
+
+**Generated:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}  
+**Analysis ID:** TMIN_{datetime.now().strftime('%Y%m%d_%H%M%S')}
+
+## Analysis Summary
+
+**Flag:** {analysis_results.get('flag', 'N/A')}  
+**Status:** {analysis_results.get('status', 'N/A')}  
+**Message:** {analysis_results.get('message', 'N/A')}
+""")
+        
+        # Pipe specifications cell
+        specs_cell = nbf.v4.new_markdown_cell(f"""## Pipe Specifications
+
+| Parameter | Value | Units |
+|-----------|-------|-------|
+| NPS | {pipe_instance.nps} | inches |
+| Schedule | {pipe_instance.schedule} | - |
+| Pressure Class | {pipe_instance.pressure_class} | - |
+| Metallurgy | {pipe_instance.metallurgy} | - |
+| Design Pressure | {pipe_instance.pressure} | psi |
+| Design Temperature | {pipe_instance.design_temp} | °F |
+| Pipe Configuration | {pipe_instance.pipe_config} | - |
+| Corrosion Rate | {pipe_instance.corrosion_rate or 'N/A'} | MPY |
+| Yield Stress | {pipe_instance.yield_stress} | psi |
+""")
+        
+        # Analysis results cell
+        results_cell = nbf.v4.new_markdown_cell(f"""## Analysis Results
+
+| Parameter | Value | Units |
+|-----------|-------|-------|
+| Measured Thickness | {analysis_results.get('measured_thickness', 0):.4f} | inches |
+| Actual Thickness | {analysis_results.get('actual_thickness', 0):.4f} | inches |
+| Pressure Minimum | {analysis_results.get('tmin_pressure', 0):.4f} | inches |
+| Structural Minimum | {analysis_results.get('tmin_structural', 0):.4f} | inches |
+| Governing Thickness | {analysis_results.get('governing_thickness', 0):.4f} | inches |
+| Governing Type | {analysis_results.get('governing_type', 'N/A')} | - |
+""")
+        
+        # Python code cell for data visualization
+        code_cell = nbf.v4.new_code_cell(f"""# Import required libraries
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+# Analysis data
+actual_thickness = {analysis_results.get('actual_thickness', 0)}
+tmin_pressure = {analysis_results.get('tmin_pressure', 0)}
+tmin_structural = {analysis_results.get('tmin_structural', 0)}
+governing_thickness = {analysis_results.get('governing_thickness', 0)}
+
+# Create thickness comparison plot
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+# Bar chart
+thickness_data = ['Actual', 'Pressure Min', 'Structural Min', 'Governing']
+thickness_values = [actual_thickness, tmin_pressure, tmin_structural, governing_thickness]
+colors = ['green' if actual_thickness >= val else 'red' for val in thickness_values]
+
+ax1.bar(thickness_data, thickness_values, color=colors, alpha=0.7)
+ax1.set_ylabel('Thickness (inches)')
+ax1.set_title('Thickness Comparison')
+ax1.grid(True, alpha=0.3)
+
+# Number line
+ax2.axhline(y=0, color='black', linewidth=0.5)
+for i, (name, value) in enumerate(zip(thickness_data, thickness_values)):
+    color = 'green' if actual_thickness >= value else 'red'
+    ax2.plot([value, value], [-0.5, 0.5], color=color, linewidth=3, label=name)
+    ax2.text(value, 0.6, f'{value:.4f}", ha='center', va='bottom')
+
+ax2.set_xlabel('Thickness (inches)')
+ax2.set_title('Thickness Number Line')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+ax2.set_ylim(-1, 1)
+
+plt.tight_layout()
+plt.show()
+
+# Display analysis summary
+print(f"Analysis Flag: {{analysis_results.get('flag', 'N/A')}}")
+print(f"Status: {{analysis_results.get('status', 'N/A')}}")
+print(f"Message: {{analysis_results.get('message', 'N/A')}}")
+
+if analysis_results.get('corrosion_allowance'):
+    print(f"Corrosion Allowance: {{analysis_results.get('corrosion_allowance'):.4f}} inches")
+if analysis_results.get('remaining_life_years'):
+    print(f"Estimated Remaining Life: {{analysis_results.get('remaining_life_years'):.1f}} years")
+""")
+        
+        # Add cells to notebook
+        nb.cells = [title_cell, specs_cell, results_cell, code_cell]
+        
+        # Write notebook file
+        nbf.write(nb, filepath)
+        
+        return filepath 

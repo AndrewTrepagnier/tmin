@@ -7,7 +7,7 @@ from .tables.ANSI_radii import ANSI_radii
 
 import numpy as np
 from dataclasses import dataclass
-from typing import Literal, Optional, Dict
+from typing import Literal, Optional, Dict, Any
 import matplotlib.pyplot as plt
 from datetime import datetime
 ########### Checked as of 07/31/2025
@@ -311,157 +311,159 @@ class PIPE:
     # ANALYSIS
     ####################################################################################
 
-    def analysis(self, measured_thickness: float, year_inspected: Optional[int] = None, 
-                 month_inspected: Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
-                 joint_type: Literal['Seamless', 'Welded'] = 'Seamless'):
-        """
-        Analyze pipe thickness against pressure and structural requirements
+    # def analysis(self, measured_thickness: float, year_inspected: Optional[int] = None, 
+    #              month_inspected: Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
+    #              joint_type: Literal['Seamless', 'Welded'] = 'Seamless'):
+    #     """
+    #     Analyze pipe thickness against pressure and structural requirements
         
-        Args:
-            measured_thickness: Thickness measured during inspection (inches)
-            year_inspected: Year when thickness was measured (e.g., 2020)
-            month_inspected: Month when thickness was measured (1-12, e.g., 1 for January, 12 for December)
-            joint_type: Joint type for calculations ('Seamless' or 'Welded')
+    #     Args:
+    #         measured_thickness: Thickness measured during inspection (inches)
+    #         year_inspected: Year when thickness was measured (e.g., 2020)
+    #         month_inspected: Month when thickness was measured (1-12, e.g., 1 for January, 12 for December)
+    #         joint_type: Joint type for calculations ('Seamless' or 'Welded')
             
-        Returns:
-            Dict with analysis results and governing factor
+    #     Returns:
+    #         Dict with analysis results and governing factor
             
-        Raises:
-            ValueError: If inspection year is in the future or invalid parameters
+    #     Raises:
+    #         ValueError: If inspection year is in the future or invalid parameters
             
-        Example:
-            >>> pipe = PIPE(nps=2.0, pressure_class=300, corrosion_rate=15.0, ...)
-            >>> # High corrosion rate - month precision matters
-            >>> results = pipe.analysis(0.25, 2024, 6)  # June 2024 inspection
-            >>> # vs
-            >>> results = pipe.analysis(0.25, 2024, 12)  # December 2024 inspection
-            >>> # 6 months difference with 15 MPY = 7.5 mils difference in degradation
-        """
+    #     Example:
+    #         >>> pipe = PIPE(nps=2.0, pressure_class=300, corrosion_rate=15.0, ...)
+    #         >>> # High corrosion rate - month precision matters
+    #         >>> results = pipe.analysis(0.25, 2024, 6)  # June 2024 inspection
+    #         >>> # vs
+    #         >>> results = pipe.analysis(0.25, 2024, 12)  # December 2024 inspection
+    #         >>> # 6 months difference with 15 MPY = 7.5 mils difference in degradation
+    #     """
         
-        # Edge Case Error Messages
-        if month_inspected is not None and not (1 <= month_inspected <= 12):
-            raise ValueError(f"Month must be between 1 and 12, got {month_inspected}")
+    #     # Edge Case Error Messages
+    #     if month_inspected is not None and not (1 <= month_inspected <= 12):
+    #         raise ValueError(f"Month must be between 1 and 12, got {month_inspected}")
         
-        if year_inspected is not None and year_inspected < 1900:
-            raise ValueError(f"Year must be reasonable, got {year_inspected}")
+    #     if year_inspected is not None and year_inspected < 1900:
+    #         raise ValueError(f"Year must be reasonable, got {year_inspected}")
 
-        # Calculate present-day actual thickness based on inspection year and corrosion rate
-        if year_inspected is not None and self.corrosion_rate is not None:
-            # Calculate precise time elapsed including months for high corrosion rates
-            time_elapsed = self._calculate_time_elapsed(year_inspected, month_inspected)
-            inspection_date_str = self._format_inspection_date(year_inspected, month_inspected)
+    #     # Calculate present-day actual thickness based on inspection year and corrosion rate
+    #     if year_inspected is not None and self.corrosion_rate is not None:
+    #         # Calculate precise time elapsed including months for high corrosion rates
+    #         time_elapsed = self._calculate_time_elapsed(year_inspected, month_inspected)
+    #         inspection_date_str = self._format_inspection_date(year_inspected, month_inspected)
             
-            degradation = self.corrosion_rate * time_elapsed  # Returns the amount of degradation (in Mils) since last inspection, assuming uniform, linear corrosion
+    #         degradation = self.corrosion_rate * time_elapsed  # Returns the amount of degradation (in Mils) since last inspection, assuming uniform, linear corrosion
             
-            actual_thickness = measured_thickness - self.mils_to_inches(degradation)  # Last known thickness minus the amount of degradation gives true, present-day pipe wall thickness
+    #         actual_thickness = measured_thickness - self.mils_to_inches(degradation)  # Last known thickness minus the amount of degradation gives true, present-day pipe wall thickness
             
-            print(f"Time-based corrosion calculation:")
-            if time_elapsed < 0.1:  # Less than ~1.2 months
-                print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
-                print(f"  Corrosion rate: {self.corrosion_rate} MPY")
-            else:
-                print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
-                print(f"  Corrosion rate: {self.corrosion_rate} MPY")
-                print(f"  Time elapsed: {time_elapsed:.3f} years ({time_elapsed*12:.1f} months)")
-                print(f"  Amount of Degradation since {inspection_date_str}: {self.mils_to_inches(degradation):.4f} inches (or {degradation:.1f} Mils)")
-                print(f"  Present-day thickness: {actual_thickness:.4f} inches (or {self.inches_to_mils(actual_thickness)} Mils)")
-
-        
-        else:
-            actual_thickness = measured_thickness
-            print(f"Using measured thickness as present-day thickness: {actual_thickness:.4f} inches")
-        
-        #### Checked 
-
-        tmin_pressure = self.get_pressure_thickness_requirement(joint_type)
-        tmin_structural = self.get_structural_thickness_requirement()
+    #         print(f"Time-based corrosion calculation:")
+    #         if time_elapsed < 0.1:  # Less than ~1.2 months
+    #             print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
+    #             print(f"  Corrosion rate: {self.corrosion_rate} MPY")
+    #         else:
+    #             print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
+    #             print(f"  Corrosion rate: {self.corrosion_rate} MPY")
+    #             print(f"  Time elapsed: {time_elapsed:.3f} years ({time_elapsed*12:.1f} months)")
+    #             print(f"  Amount of Degradation since {inspection_date_str}: {self.mils_to_inches(degradation):.4f} inches (or {degradation:.1f} Mils)")
+    #             print(f"  Present-day thickness: {actual_thickness:.4f} inches (or {self.inches_to_mils(actual_thickness)} Mils)")
 
         
-        default_retirement_limit = self.default_retirement_limit # Optional user-defined, company-specific retirement limit
+    #     else:
+    #         actual_thickness = measured_thickness
+    #         print(f"Using measured thickness as present-day thickness: {actual_thickness:.4f} inches")
         
-        limits = {
-            "pressure": tmin_pressure,
-            "structural": tmin_structural,
-        }
+    #     #### Checked 
 
-        # This conditional take the larger of the two required thicknesses, this will determine whether the pipe is structurally governed or pressure governed
-        if limits["pressure"] >= limits["structural"]:
-            governing_thickness = limits["pressure"]
-            governing_type = "pressure" 
+    #     tmin_pressure = self.get_pressure_thickness_requirement(joint_type)
+    #     tmin_structural = self.get_structural_thickness_requirement()
+
+        
+    #     default_retirement_limit = self.default_retirement_limit # Optional user-defined, company-specific retirement limit
+        
+    #     limits = {
+    #         "pressure": tmin_pressure,
+    #         "structural": tmin_structural,
+    #     }
+
+    #     # This conditional take the larger of the two required thicknesses, this will determine whether the pipe is structurally governed or pressure governed
+    #     if limits["pressure"] >= limits["structural"]:
+    #         governing_thickness = limits["pressure"]
+    #         governing_type = "pressure" 
             
-        else:
-            governing_thickness = limits["structural"]
-            governing_type = "structural"
+    #     else:
+    #         governing_thickness = limits["structural"]
+    #         governing_type = "structural"
 
-        print("----------- THICKNESS REQUIREMENT ----------")
-        print(f"The pipe is {governing_type} thickness governed, pipe retirement is required at {governing_thickness} inches ({self.inches_to_mils(governing_thickness)} Mils)")
-        print("-----------------------------------------------------")
+    #     print("----------- THICKNESS REQUIREMENT ----------")
+    #     print(f"The pipe is {governing_type} thickness governed, pipe retirement is required at {governing_thickness} inches ({self.inches_to_mils(governing_thickness)} Mils)")
+    #     print("-----------------------------------------------------")
         
-        if default_retirement_limit is not None:
-            if default_retirement_limit - actual_thickness >= 0:
-                below_defaultRL = default_retirement_limit - actual_thickness
-            else:
-                print(f"The actual thickness is greater than default (company-specified) retirement limit by {actual_thickness - default_retirement_limit}")
-                below_defaultRL = None
-        else:
-            below_defaultRL = None
+    #     if default_retirement_limit is not None:
+    #         if default_retirement_limit - actual_thickness >= 0:
+    #             below_defaultRL = default_retirement_limit - actual_thickness
+    #         else:
+    #             print(f"The actual thickness is greater than default (company-specified) retirement limit by {actual_thickness - default_retirement_limit}")
+    #             below_defaultRL = None
+    #     else:
+    #         below_defaultRL = None
         
-        if governing_type == "structural":
+    #     if governing_type == "structural":
             
-            api574_value = self.get_structural_thickness_requirement()
-            if api574_value < actual_thickness:
-                corosion_allowance = actual_thickness - api574_value
-                print(f"There is {corosion_allowance} inches ({self.inches_to_mils(corosion_allowance)} Mils) of corrosion allowance remaining")
-            else:
-                print(f"Actual Thickness is {api574_value - actual_thickness} inches below corresponding API 574 Structural Retirement Limit for {self.metallurgy}, Retirement Recommended, Fit For Service assessment is needed")
-                corosion_allowance = None
+    #         api574_value = self.get_structural_thickness_requirement()
+    #         if api574_value < actual_thickness:
+    #             corosion_allowance = actual_thickness - api574_value
+    #             print(f"There is {corosion_allowance} inches ({self.inches_to_mils(corosion_allowance)} Mils) of corrosion allowance remaining")
+    #         else:
+    #             print(f"Actual Thickness is {api574_value - actual_thickness} inches below corresponding API 574 Structural Retirement Limit for {self.metallurgy}, Retirement Recommended, Fit For Service assessment is needed")
+    #             corosion_allowance = None
 
-        else:
-            if governing_thickness >= actual_thickness:
-                print(f"Actual Thickness is {governing_thickness - actual_thickness} inches ({self.inches_to_mils(governing_thickness - actual_thickness)} Mils), Retire Pipe Immediately, miniumum pressure containing thickness is not satisfied")
+    #     else:
+    #         if governing_thickness >= actual_thickness:
+    #             print(f"Actual Thickness is {governing_thickness - actual_thickness} inches ({self.inches_to_mils(governing_thickness - actual_thickness)} Mils), Retire Pipe Immediately, miniumum pressure containing thickness is not satisfied")
         
-        return {
-            "measured_thickness": measured_thickness,
-            "year_inspected": year_inspected,
-            "actual_thickness": actual_thickness,
-            "tmin_pressure": tmin_pressure,
-            "tmin_structural": tmin_structural,
-            "default_retirement_limit": default_retirement_limit,
-            "below_defaultRL": below_defaultRL,
-            "api574_RL": self.get_structural_thickness_requirement(),
-            "above_api574RL": corosion_allowance,
-            "life_span": self.calculate_corrosion_allowance(corosion_allowance, self.corrosion_rate) if corosion_allowance is not None and self.corrosion_rate is not None else None,
-            "governing_thickness": governing_thickness,
-            "governing_type": governing_type,
-        }
+    #     return {
+    #         "measured_thickness": measured_thickness,
+    #         "year_inspected": year_inspected,
+    #         "actual_thickness": actual_thickness,
+    #         "tmin_pressure": tmin_pressure,
+    #         "tmin_structural": tmin_structural,
+    #         "default_retirement_limit": default_retirement_limit,
+    #         "below_defaultRL": below_defaultRL,
+    #         "api574_RL": self.get_structural_thickness_requirement(),
+    #         "above_api574RL": corosion_allowance,
+    #         "life_span": self.calculate_corrosion_allowance(corosion_allowance, self.corrosion_rate) if corosion_allowance is not None and self.corrosion_rate is not None else None,
+    #         "governing_thickness": governing_thickness,
+    #         "governing_type": governing_type,
+    #     }
     
     def analysis(self, measured_thickness : float, year_inspected : Optional[int] = None, month_inspected : Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
                  joint_type = 'seamless'):
 
         """
-        The goal of analysis is to determine where you present-day lie on the pipe wall and compare it to industry standards to assess when the next retirement limit is a give a timeframe
+        The intent of analysis is to determine the present-day nominal thickness lies on the overall, 'like-new' pipe wall thickness and compare it to industry standards to assess if it is safe to lower the retirement limit and elongate the pipe's operational life.
 
-        Time and corrosion logic here -> time_elapsed, corrosion allowance, amount of degradation since last inspection
+        This function has the logic flow:
 
-        take the max of the structural min and the pressure min -> governinng type, when is the code_cal retirement limit. Any lower than this is a FFS
+        1) Logic that calculates present-day thicknesses using time-based corrosion analysis (if needed) -> time_elapsed, corrosion allowance, amount of degradation since last inspection
 
-        If you are above API 574, but below default RL, and above pressure min then set your next tmin to API574's and calculate the corrosion allowance between that point
+        2) Logic that takes the max of the structural min and the pressure min -> governinng type, when is the code_cal retirement limit. Any lower than this is a FFS
 
-        If you are below API 574, below default RL, but above pressure min then inform user how far below API574 they are, Fitness for service + engineering judgement is required.
+        3) Conditionals determine suggested actions based on the following:
+        
+            -If you are above API 574, but below default RL, and above pressure min then, set your next tmin to API574's and calculate the corrosion allowance between that point
 
-        If you are below pressure min, immediately return FFS and Suggest Immediate Retirement
+            -If you are below API 574, below default RL, but above pressure min then, inform user how far below API574 they are, Fitness for service + engineering judgement is required.
+
+            -If you are below pressure min then, immediately return FFS and Suggest Immediate Retirement and emphasize the need for risk assessment
 
 
+        4) New Analysis system returns "Green", "Yellow", or "Red" Flags based off of the user-provided inspection and pipe information
 
+            Green Flag - Criteria is satisfied - The pipe can safely remain in service based on the calculated thickness minimums, it should provide users with the corrosion allowance until the next retirement limit
+                as well as how much time until the pipe reaches that next RL
 
-        New Analysis system returns "Green", "Yellow", or "Red" Flags based off of the user-provided inspection and pipe information
+            Yellow Flag - Not all of the code criteria was satisfied. User is below default min and or API574 min. Pipe requires a more advanced analysis to assess whether continuing operations is safe (e.q. FFS is recommended)
 
-        Green Flag - Criteria is satisfied - The pipe can safely remain in service based on the calculated thickness minimums, it should provide users with the corrosion allowance until the next retirement limit
-        as well as how much time until the pipe reaches that next RL
-
-        yellow flag - Not all of the code criteria was satisfied. User is below default min and or API574 min. Pipe requires a more advanced analysis to assess whether continuing operations is safe (e.q. FFS is recommended)
-
-        Red Flag - Pipe is below pressure min, Retire Pipe Immediately or consider temporary leak device. Rigorous analysis is requried for continuing operations
+            Red Flag - Pipe is below pressure min, Retire Pipe Immediately or consider temporary leak device. Rigorous analysis is requried for continuing operations
         
         """
         ####################
@@ -544,7 +546,7 @@ class PIPE:
         # YELLOW FLAG: Above pressure but below structural or default retirement limit
         elif (actual_thickness > limits["pressure"] and 
               (actual_thickness <= limits["structural"] or 
-               (default_retirement_limit is not None and actual_thickness <= default_retirement_limit))):
+               (default_retirement_limit is not None and actual_thickness <= default_retirement_limit and actual_thickness > limits["pressure"]))):
             return self.yellow_flag(analysis_data)
         
         # GREEN FLAG: Above all limits - Safe to continue operation
@@ -560,7 +562,6 @@ class PIPE:
         print(f"Criteria Satisfied per API {self.API_table} / ASME Code")
         print(f"Piping can safely continue in operation")
         
-        # Calculate corrosion allowance and remaining life
         actual_thickness = analysis_data["actual_thickness"]
         governing_thickness = analysis_data["governing_thickness"]
         default_retirement_limit = analysis_data["default_retirement_limit"]
@@ -571,7 +572,7 @@ class PIPE:
             retirement_type = "company-specified"
         else:
             next_retirement_limit = governing_thickness
-            retirement_type = f"{analysis_data['governing_type']} design"
+            retirement_type = f"New Retirement limit is governed by {analysis_data['governing_type']} design"
         
         corrosion_allowance = actual_thickness - next_retirement_limit
         
@@ -665,41 +666,100 @@ class PIPE:
 
 
 
-    def report(self, measured_thickness: float, year_inspected: Optional[int] = None, joint_type='Seamless') -> Dict[str, str]:
+    def report(self, report_format: Literal["CSV", "JSON", "TXT", "IPYNB"] = "TXT", 
+               filename: Optional[str] = None, **analysis_kwargs) -> Dict[str, Any]:
         """
-        Generate analysis with text report and visualizations
+        Generate analysis report in specified format
         
         Args:
-            measured_thickness: Thickness measured during inspection (inches)
-            year_inspected: Year when thickness was measured (e.g., 2020)
-            joint_type: Joint type for calculations
+            report_format: Format of the report ("CSV", "JSON", "TXT", "IPYNB")
+            filename: Optional filename (without extension) for the report
+            **analysis_kwargs: Arguments to pass to analysis() method if not already called
             
         Returns:
-            Dict containing paths to generated files
+            Dict containing report data and file paths
+            
+        Example:
+            >>> pipe = PIPE(nps=2.0, pressure_class=300, ...)
+            >>> # Generate CSV report
+            >>> results = pipe.report("CSV", measured_thickness=0.25, year_inspected=2024)
+            >>> # Generate JSON report with custom filename
+            >>> results = pipe.report("JSON", "my_analysis", measured_thickness=0.25)
         """
         from .report_generator import ReportGenerator
         from .visualization import ThicknessVisualizer
         
-        # Perform analysis
-        analysis_results = self.analysis(measured_thickness, year_inspected, joint_type)
+        # Check if analysis has already been performed (stored in instance)
+        if not hasattr(self, '_last_analysis_results'):
+            # Perform analysis with provided kwargs
+            if not analysis_kwargs:
+                raise ValueError("Analysis arguments required. Provide measured_thickness and other parameters.")
+            
+            self._last_analysis_results = self.analysis(**analysis_kwargs)
         
-        # Get the present-day actual thickness from results
+        analysis_results = self._last_analysis_results
         actual_thickness = analysis_results['actual_thickness']
         
-        # Generate reports
+        # Initialize report generator
         report_gen = ReportGenerator()
-        full_report_path = report_gen.generate_report(self, analysis_results, actual_thickness)
-        summary_report_path = report_gen.generate_summary_report(self, analysis_results, actual_thickness)
         
-        # Generate visualizations
-        visualizer = ThicknessVisualizer()
-        number_line_path = visualizer.create_thickness_number_line(self, analysis_results, actual_thickness)
-        comparison_chart_path = visualizer.create_comparison_chart(analysis_results, actual_thickness)
+        # Generate report based on format
+        if report_format.upper() == "CSV":
+            report_path = report_gen.generate_csv_report(self, analysis_results, filename)
+            return {
+                "format": "CSV",
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "JSON":
+            report_path = report_gen.generate_json_report(self, analysis_results, filename)
+            return {
+                "format": "JSON", 
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "TXT":
+            # Generate both full and summary text reports
+            full_report_path = report_gen.generate_report(self, analysis_results, actual_thickness, filename)
+            summary_report_path = report_gen.generate_summary_report(self, analysis_results, actual_thickness, filename)
+            
+            # Generate visualizations
+            visualizer = ThicknessVisualizer()
+            number_line_path = visualizer.create_thickness_number_line(self, analysis_results, actual_thickness)
+            comparison_chart_path = visualizer.create_comparison_chart(analysis_results, actual_thickness)
+            
+            return {
+                "format": "TXT",
+                "full_report": full_report_path,
+                "summary_report": summary_report_path,
+                "number_line_plot": number_line_path,
+                "comparison_chart": comparison_chart_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "IPYNB":
+            report_path = report_gen.generate_notebook_report(self, analysis_results, filename)
+            return {
+                "format": "IPYNB",
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        else:
+            raise ValueError(f"Unsupported report format: {report_format}. Supported formats: CSV, JSON, TXT, IPYNB")
+    
+    def get_last_analysis(self) -> Optional[Dict[str, Any]]:
+        """
+        Get the results from the last analysis performed
         
-        return {
-            "full_report": full_report_path,
-            "summary_report": summary_report_path,
-            "number_line_plot": number_line_path,
-            "comparison_chart": comparison_chart_path,
-            "analysis_results": analysis_results
-        }
+        Returns:
+            Dict containing last analysis results or None if no analysis performed
+        """
+        return getattr(self, '_last_analysis_results', None)
+    
+    def clear_analysis_cache(self):
+        """Clear the cached analysis results"""
+        if hasattr(self, '_last_analysis_results'):
+            delattr(self, '_last_analysis_results')
