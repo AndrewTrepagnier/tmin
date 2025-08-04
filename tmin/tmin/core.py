@@ -476,6 +476,9 @@ class PIPE:
         
         if year_inspected is not None and year_inspected < 1900:
             raise ValueError(f"Year must be reasonable, got {year_inspected}")
+        
+        if default_retirement_limit < self.get_structural_thickness_requirement():
+            raise ValueError(f"Default, company-specific retirement limits shall not be below API {self.API_table} appointed structural thickness requirements")
 
         ###############################
         # Time-Based Corrosion Analysis
