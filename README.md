@@ -1,20 +1,31 @@
-# TMIN - Under development
-[![Downloads](https://pepy.tech/badge/tmin)](https://pepy.tech/project/tmin)
-![License](https://img.shields.io/pypi/l/tmin)    
+# TMIN: The Fast Pipe Thickness Analysis Tool
+
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/52007543-8109-44ff-845e-c6a809a89a38" alt="TMIN Logo" width="700" />
+</p>
+
+
 [![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
-![Python](https://img.shields.io/pypi/pyversions/tmin)
+[![Downloads per month](https://pepy.tech/badge/tmin/month)](https://pepy.tech/project/tmin)
+![License](https://img.shields.io/pypi/l/tmin)
+![Python Version](https://img.shields.io/pypi/pyversions/tmin)
+[![Blog](https://img.shields.io/badge/read-blog-purple)](https://your-blog-link.com)
+[![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://your-blog-link.com)
 
-**The rapid pipe thickness analysis tool that tells you if your process pipe is safe to operate.**
 
-All process pipes corrode over time, this package helps determine whether the pipe has structural/pressure integrity and is ASME/API-compliant, all with one python function.
 
-In your terminal, download the package via: 
+TMIN helps engineers determine if corroded process piping are safe and API/ASME-compliant — in seconds.
+
+
+---
+
+## 📦 Install
 
 ```bash
 pip install tmin
 ```
 
----
+
 ## You have an inspection report. Now what?
 
 **Scenario:** UT readings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
