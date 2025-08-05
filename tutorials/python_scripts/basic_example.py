@@ -6,7 +6,7 @@ Basic TMIN Example
 Minimal example showing core TMIN functionality.
 """
 
-from tmin.tmin.core import PIPE
+from tmin.core import PIPE
 
 # Create a pipe instance
 pipe = PIPE(
@@ -37,5 +37,5 @@ print(f"Pressure Minimum: {results['tmin_pressure']:.4f} inches")
 print(f"Structural Minimum: {results['tmin_structural']:.4f} inches")
 
 # Generate a report using cached analysis
-report = pipe.report("TXT")
+report = pipe.report("IPYNB")
 print(f"Report saved: {report['file_path']}") 
