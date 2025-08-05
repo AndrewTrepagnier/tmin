@@ -4,49 +4,45 @@
   <img src="https://github.com/user-attachments/assets/52007543-8109-44ff-845e-c6a809a89a38" alt="TMIN Logo" width="700" />
 </p>
 
-
-[![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
 [![Downloads per month](https://pepy.tech/badge/tmin/month)](https://pepy.tech/project/tmin)
+[![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
 ![License](https://img.shields.io/pypi/l/tmin)
-![Python Version](https://img.shields.io/pypi/pyversions/tmin)
-[![Blog](https://img.shields.io/badge/read-blog-purple)](https://your-blog-link.com)
+[![Blog](https://img.shields.io/badge/Updates-blog-purple)](https://your-blog-link.com)
 [![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://your-blog-link.com)
+[![Blog](https://img.shields.io/badge/Important-DesignDoc-pink)](https://your-blog-link.com)
 
+TMIN is an open source software designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
 
+Many oil and gas companies are faced with maintaining thousands of miles of 100+ year old piping networks supporting multi-million dollar/year processing operations. There is rarely a simple solution to immediately shutdown a process pipe - as these shutdowns more often than not impact other units and cost companies millions in time and resources.
 
-TMIN helps engineers determine if corroded process piping are safe and API/ASME-compliant — in seconds.
-
+***This is more than a python package, it is a comprehensive engineering decision support system for critical infrastructure safety and operational continuity.***
 
 ---
 
-## 📦 Install
+# Getting Started
+
+### Installation:
 
 ```bash
 pip install tmin
 ```
 
 
-## You have an inspection report. Now what?
+### Suppose the following scenario:
 
-**Scenario:** UT readings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
-
-**The Previous Way:** Hours of manual calculations, code book lookups, and hoping you didn't miss anything.
-
-**The TMIN way:** One Python script, instant answers.
-
-![pipe_thinning](https://github.com/user-attachments/assets/abba85a5-096e-4824-98ee-4d90ff32e206)
+   <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/1f87dcb1-7d17-4c25-888b-6d9131098ec0"/>
 
 
----
 
-## Get Started in 60 Seconds
+RT findings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
 
-### 1. Install
-```bash
-pip install tmin
-```
 
-### 2. Run ASME/API-Compliant Analysis in 1 Minute
+
+
+**The Previous Way:** time consuming handwritten calculations, tedious code book lookups, and hours of typing full assessment reports
+
+**With TMIN:** One Python script, instant answers.
+
 ```python
 import tmin
 
@@ -68,55 +64,6 @@ print(f"Remaining life: {results['life_span']} years")
 
 **Result:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
 
-### 3. Get Results
-```python
-print(f"✅ Pressure Design: {results['tmin_pressure']:.4f}\" minimum required")
-print(f"✅ Structural: {results['tmin_structural']:.4f}\" minimum required")
-print(f"✅ Current: {results['actual_thickness']:.4f}\" measured thickness")
-print(f"✅ Status: {'SAFE TO OPERATE' if results['actual_thickness'] > results['governing_thickness'] else 'RETIRE IMMEDIATELY'}")
-print(f"✅ Remaining Life: {results['life_span']} years at {pipe.corrosion_rate} mpy corrosion")
-```
-
-**Generate Full Report:**
-```python
-# Create professional reports and visualizations
-report_files = pipe.report(measured_thickness=0.060)
-print("Generated:", list(report_files.keys()))
-```
-
----
-
-## Engineering Problems Solved
-
-**"Is this pipe safe?"**
-```python
-import tmin
-pipe = tmin.PIPE(schedule="40", nps="2", pressure=50.0, 
-                pressure_class=150, metallurgy="Intermediate/Low CS", 
-                allowable_stress=23333.0)
-results = pipe.analysis(measured_thickness=0.060)
-print(f"Safe to operate: {results['actual_thickness'] > results['governing_thickness']}")
-```
-
-**"How much time do we have?"**
-```python
-# TMIN automatically calculates remaining life based on corrosion rate
-print(f"Remaining life: {results['life_span']} years")
-```
-
-**"Are we code compliant?"**
-```python
-# TMIN checks against ASME B31.1 and API 574 automatically
-print(f"API 574 compliant: {results['actual_thickness'] > results['api574_RL']}")
-```
-
-**"What's our corrosion allowance?"**
-```python
-# TMIN calculates safety margin above retirement limits
-print(f"Corrosion allowance: {results['above_api574RL']:.4f}\" inches")
-```
-
----
 
 ## Why TMIN
 
@@ -156,17 +103,6 @@ Governing factor identification. Safety margin analysis. Professional documentat
 |-----------|-----------|------------------|--------------|
 | 10, 40, 80, 120, 160 | 0.5" to 24" | 150, 300, 600, 900, 1500, 2500 | Carbon Steel, Stainless Steel, Nickel Alloys |
 
----
-
-## Perfect For
-
-**Mechanical Integrity Engineers** - Quick compliance checks
-**Reliability Specialists** - Life extension analysis  
-**Operations Teams** - Emergency thickness evaluations
-**Inspection Contractors** - Professional reporting
-**Engineering Consultants** - Client deliverables
-
----
 
 ## Command Line Interface
 
