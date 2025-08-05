@@ -8,12 +8,22 @@ class ReportGenerator:
     """
     
     def __init__(self):
+        # Get the root directory of the package (where setup.py/pyproject.toml is located)
+        # This ensures reports are always generated in the package root
+        current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/tmin/
+        package_root = os.path.dirname(os.path.dirname(current_dir))  # Go up two levels to package root
+        self.reports_dir = os.path.join(package_root, "Reports")
+        os.makedirs(self.reports_dir, exist_ok=True)
         self.report_template = """
 TMIN - PIPE THICKNESS ANALYSIS REPORT
 =====================================
 
 Report Generated: {timestamp}
 Analysis ID: {analysis_id}
+
+FLAG STATUS: {flag_status}
+Status: {status}
+Message: {message}
 
 PIPE SPECIFICATIONS
 -------------------
@@ -64,9 +74,6 @@ NOTES
 -----
 {notes}
 """
-        # Create Reports directory if it doesn't exist
-        self.reports_dir = "Reports"
-        os.makedirs(self.reports_dir, exist_ok=True)
     
     def _get_filename_with_date(self, base_name: str, filename: Optional[str] = None) -> str:
         """Generate filename with date prefix"""
@@ -127,6 +134,9 @@ NOTES
         report_content = self.report_template.format(
             timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             analysis_id=analysis_id,
+            flag_status=analysis_results.get('flag', 'N/A'),
+            status=analysis_results.get('status', 'N/A'),
+            message=analysis_results.get('message', 'N/A'),
             nps=pipe_instance.nps,
             schedule=pipe_instance.schedule,
             pressure_class=pipe_instance.pressure_class,
@@ -211,7 +221,7 @@ NOTES
         
         notes.append(f"• Analysis based on ASME B31.1 pressure design equations")
         notes.append(f"• Structural requirements from API 574 Table D.2")
-        notes.append(f"• Y-coefficient used: {pipe_instance.get_Y_coefficient()}")
+        notes.append(f"• Y-coefficient used: {pipe_instance.get_y_coefficient()}")
         
         if pipe_instance.corrosion_rate:
             notes.append(f"• Corrosion rate considered: {pipe_instance.corrosion_rate} mpy")
@@ -248,9 +258,6 @@ NOTES
         thickness_values = [tmin_pressure, tmin_structural, api574_RL]
         if retirement_limit is not None:
             thickness_values.append(retirement_limit)
-        # Debug print
-        print(f"DEBUG: tmin_pressure={tmin_pressure}, tmin_structural={tmin_structural}, api574_RL={api574_RL}, retirement_limit={retirement_limit}")
-        print(f"DEBUG: thickness_values for min/max: {thickness_values}")
 
         # Find the maximum thickness requirement (most conservative)
         max_thickness = max(thickness_values) if thickness_values else 0
@@ -529,56 +536,66 @@ Report Generated: {timestamp}
 """)
         
         # Python code cell for data visualization
-        code_cell = nbf.v4.new_code_cell(f"""# Import required libraries
+        code_content = f"""# Import required libraries
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+from tmin.tmin.visualization import ThicknessVisualizer
 
 # Analysis data
 actual_thickness = {analysis_results.get('actual_thickness', 0)}
 tmin_pressure = {analysis_results.get('tmin_pressure', 0)}
 tmin_structural = {analysis_results.get('tmin_structural', 0)}
 governing_thickness = {analysis_results.get('governing_thickness', 0)}
+flag = "{analysis_results.get('flag', 'N/A')}"
+status = "{analysis_results.get('status', 'N/A')}"
+message = "{analysis_results.get('message', 'N/A')}"
+corrosion_allowance = {analysis_results.get('corrosion_allowance', 'None')}
+remaining_life_years = {analysis_results.get('remaining_life_years', 'None')}
 
-# Create thickness comparison plot
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+# Create a simple inline thickness comparison plot
+fig, ax = plt.subplots(figsize=(10, 6))
 
-# Bar chart
-thickness_data = ['Actual', 'Pressure Min', 'Structural Min', 'Governing']
-thickness_values = [actual_thickness, tmin_pressure, tmin_structural, governing_thickness]
-colors = ['green' if actual_thickness >= val else 'red' for val in thickness_values]
+# Prepare data
+categories = ['Actual', 'Pressure Min', 'Structural Min', 'Governing']
+values = [actual_thickness, tmin_pressure, tmin_structural, governing_thickness]
+colors = ['green' if actual_thickness >= val else 'red' for val in values]
 
-ax1.bar(thickness_data, thickness_values, color=colors, alpha=0.7)
-ax1.set_ylabel('Thickness (inches)')
-ax1.set_title('Thickness Comparison')
-ax1.grid(True, alpha=0.3)
+# Create bars
+bars = ax.bar(categories, values, color=colors, alpha=0.7)
 
-# Number line
-ax2.axhline(y=0, color='black', linewidth=0.5)
-for i, (name, value) in enumerate(zip(thickness_data, thickness_values)):
-    color = 'green' if actual_thickness >= value else 'red'
-    ax2.plot([value, value], [-0.5, 0.5], color=color, linewidth=3, label=name)
-    ax2.text(value, 0.6, f'{value:.4f}", ha='center', va='bottom')
+# Add value labels on bars
+for bar, value in zip(bars, values):
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+           f'{{value:.4f}}"', ha='center', va='bottom')
 
-ax2.set_xlabel('Thickness (inches)')
-ax2.set_title('Thickness Number Line')
-ax2.legend()
-ax2.grid(True, alpha=0.3)
-ax2.set_ylim(-1, 1)
-
+# Customize plot
+ax.set_ylabel('Thickness (inches)', fontsize=12)
+ax.set_title('TMIN - Thickness Comparison', fontsize=14, fontweight='bold')
+ax.grid(True, alpha=0.3, axis='y')
+plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 plt.show()
 
 # Display analysis summary
-print(f"Analysis Flag: {{analysis_results.get('flag', 'N/A')}}")
-print(f"Status: {{analysis_results.get('status', 'N/A')}}")
-print(f"Message: {{analysis_results.get('message', 'N/A')}}")
+print(f"Analysis Flag: {{flag}}")
+print(f"Status: {{status}}")
+print(f"Message: {{message}}")
 
-if analysis_results.get('corrosion_allowance'):
-    print(f"Corrosion Allowance: {{analysis_results.get('corrosion_allowance'):.4f}} inches")
-if analysis_results.get('remaining_life_years'):
-    print(f"Estimated Remaining Life: {{analysis_results.get('remaining_life_years'):.1f}} years")
-""")
+if corrosion_allowance is not None:
+    print(f"Corrosion Allowance: {{corrosion_allowance:.4f}} inches")
+if remaining_life_years is not None:
+    print(f"Estimated Remaining Life: {{remaining_life_years:.1f}} years")
+
+# Display key thickness values
+print(f"\\nKey Thickness Values:")
+print(f"Actual Thickness: {{actual_thickness:.4f}} inches")
+print(f"Pressure Minimum: {{tmin_pressure:.4f}} inches")
+print(f"Structural Minimum: {{tmin_structural:.4f}} inches")
+print(f"Governing Thickness: {{governing_thickness:.4f}} inches")
+"""
+        
+        code_cell = nbf.v4.new_code_cell(code_content)
         
         # Add cells to notebook
         nb.cells = [title_cell, specs_cell, results_cell, code_cell]

@@ -18,18 +18,15 @@ class PIPE:
     #########Initialize Characteristics of the Pipe and Service###############
 
     pressure: float  # Design pressure (psi)
-    design_temp: Literal["<900" ,900, 950, 1000, 1050, 1100, 1150, 1200, 1250, "1250+" ] = 900
-
-
-    pipe_config: Literal["straight", "90LR - Inner Elbow", "90LR - Outer Elbow"] = "straight"
     metallurgy: Literal["Intermediate/Low CS", "SS 316/316L", "SS 304/304L", "Inconel 625", "Other"]
     yield_stress: float # User defined yield Stress
-
     schedule: float  # Pipe schedule (10, 40, 80, 120, 160)
     nps: float # Nominal pipe size (e.g., '2', '3/4', '1-1/2')
     pressure_class: Literal[150, 300, 600, 900, 1500, 2500]
     
-    
+    # Optional fields with defaults
+    design_temp: Literal["<900" ,900, 950, 1000, 1050, 1100, 1150, 1200, 1250, "1250+" ] = 900
+    pipe_config: Literal["straight", "90LR - Inner Elbow", "90LR - Outer Elbow"] = "straight"
     corrosion_rate: Optional[float] = None #mpy 
     default_retirement_limit: Optional[float] = None
     API_table : Literal["2025", "2009"] = "2025"
@@ -207,7 +204,7 @@ class PIPE:
     
     def calculate_corrosion_allowance(self, excess_thickness, corrosion_rate) -> float:
         """Calculate remaining life based on excess thickness and corrosion rate"""
-        return np.floor(self.inches_to_mils(excess_thickness) * corrosion_rate)
+        return self.inches_to_mils(excess_thickness) / corrosion_rate
 
     #####################################################################################
     # Calculate Time Elapsed since Inspection (Used in Analysis)
@@ -477,7 +474,10 @@ class PIPE:
         if year_inspected is not None and year_inspected < 1900:
             raise ValueError(f"Year must be reasonable, got {year_inspected}")
         
-        if default_retirement_limit < self.get_structural_thickness_requirement():
+        # Get default retirement limit early for validation
+        default_retirement_limit = self.default_retirement_limit
+        
+        if default_retirement_limit is not None and default_retirement_limit < self.get_structural_thickness_requirement():
             raise ValueError(f"Default, company-specific retirement limits shall not be below API {self.API_table} appointed structural thickness requirements")
 
         ###############################
@@ -507,8 +507,6 @@ class PIPE:
         tmin_pressure = self.get_pressure_thickness_requirement(joint_type)
         tmin_structural = self.get_structural_thickness_requirement()
 
-        
-        default_retirement_limit = self.default_retirement_limit # Optional user-defined, company-specific retirement limit
         
         limits = {
             "pressure": tmin_pressure,
@@ -544,17 +542,21 @@ class PIPE:
 
         # RED FLAG: Below pressure minimum - Immediate retirement required
         if actual_thickness <= limits["pressure"]:
-            return self.red_flag(analysis_data)
+            result = self.red_flag(analysis_data)
         
         # YELLOW FLAG: Above pressure but below structural or default retirement limit
         elif (actual_thickness > limits["pressure"] and 
               (actual_thickness <= limits["structural"] or 
                (default_retirement_limit is not None and actual_thickness <= default_retirement_limit and actual_thickness > limits["pressure"]))):
-            return self.yellow_flag(analysis_data)
+            result = self.yellow_flag(analysis_data)
         
         # GREEN FLAG: Above all limits - Safe to continue operation
         else:
-            return self.green_flag(analysis_data)
+            result = self.green_flag(analysis_data)
+        
+        # Store results for caching
+        self._last_analysis_results = result
+        return result
             
     def green_flag(self, analysis_data):
         """Green Flag: All criteria satisfied - pipe can safely continue in operation"""
@@ -724,21 +726,11 @@ class PIPE:
             }
             
         elif report_format.upper() == "TXT":
-            # Generate both full and summary text reports
-            full_report_path = report_gen.generate_report(self, analysis_results, actual_thickness, filename)
-            summary_report_path = report_gen.generate_summary_report(self, analysis_results, actual_thickness, filename)
-            
-            # Generate visualizations
-            visualizer = ThicknessVisualizer()
-            number_line_path = visualizer.create_thickness_number_line(self, analysis_results, actual_thickness)
-            comparison_chart_path = visualizer.create_comparison_chart(analysis_results, actual_thickness)
-            
+            # Generate full text report
+            report_path = report_gen.generate_report(self, analysis_results, actual_thickness, filename)
             return {
                 "format": "TXT",
-                "full_report": full_report_path,
-                "summary_report": summary_report_path,
-                "number_line_plot": number_line_path,
-                "comparison_chart": comparison_chart_path,
+                "file_path": report_path,
                 "analysis_results": analysis_results
             }
             

@@ -10,7 +10,11 @@ class ThicknessVisualizer:
     """
     
     def __init__(self):
-        self.reports_dir = "Reports"
+        # Get the root directory of the package (where setup.py/pyproject.toml is located)
+        # This ensures reports are always generated in the package root
+        current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/tmin/
+        package_root = os.path.dirname(os.path.dirname(current_dir))  # Go up two levels to package root
+        self.reports_dir = os.path.join(package_root, "Reports")
         os.makedirs(self.reports_dir, exist_ok=True)
     
     def _get_filename_with_date(self, base_name: str, filename: Optional[str] = None) -> str:
