@@ -8,10 +8,10 @@ class ReportGenerator:
     """
     
     def __init__(self):
-        # Get the root directory of the package (where setup.py/pyproject.toml is located)
+        # Get the root directory of the package (where pyproject.toml is located)
         # This ensures reports are always generated in the package root
-        current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/tmin/
-        package_root = os.path.dirname(os.path.dirname(current_dir))  # Go up two levels to package root
+        current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/
+        package_root = os.path.dirname(current_dir)  # Go up one level to package root
         self.reports_dir = os.path.join(package_root, "Reports")
         os.makedirs(self.reports_dir, exist_ok=True)
         self.report_template = """
@@ -23,48 +23,30 @@ Analysis ID: {analysis_id}
 
 FLAG STATUS: {flag_status}
 Status: {status}
-Message: {message}
+
+EXECUTIVE SUMMARY
+-----------------
+{message}
+
+KEY FINDINGS
+------------
+• Actual Thickness: {actual_thickness:.4f} inches
+• Governing Thickness: {governing_thickness:.4f} inches ({governing_type})
+• Corrosion Allowance: {corrosion_allowance} inches
+• Estimated Remaining Life: {remaining_life} years
 
 PIPE SPECIFICATIONS
 -------------------
-Nominal Pipe Size (NPS): {nps}
-Schedule: {schedule}
-Pressure Class: {pressure_class}
+NPS: {nps}" Schedule {schedule}, Class {pressure_class}
 Metallurgy: {metallurgy}
 Design Pressure: {pressure} psi
-Pipe Configuration: {pipe_config}
 Corrosion Rate: {corrosion_rate} mpy
 
-THICKNESS MEASUREMENT DATA
---------------------------
-Measured Thickness: {measured_thickness:.4f} inches
-Inspection Year: {year_inspected}
-Present-Day Thickness: {actual_thickness:.4f} inches
-
-DESIGN REQUIREMENTS
--------------------
-Pressure Design Minimum: {tmin_pressure:.4f} inches
-Structural Minimum (API 574): {tmin_structural:.4f} inches
-Governing Thickness: {governing_thickness:.4f} inches
-Governing Factor: {governing_type}
-
-RETIREMENT LIMITS
------------------
-Retirement Limit: {retirement_limit}
-API 574 Retirement Limit: {api574_RL:.4f} inches
-
-THICKNESS ANALYSIS
-------------------
-Pressure Design Adequacy: {pressure_adequate}
-Structural Adequacy: {structural_adequate}
-Retirement Status: {retirement_status}
-API 574 Status: {api574_status}
-
-CORROSION ALLOWANCE
--------------------
-Above API 574 RL: {above_api574} inches
-Below Retirement Limit: {below_retirement} inches
-Estimated Life Span: {life_span} years
+THICKNESS REQUIREMENTS
+----------------------
+Pressure Minimum: {tmin_pressure:.4f} inches
+Structural Minimum: {tmin_structural:.4f} inches
+API 574 RL: {api574_RL:.4f} inches
 
 RECOMMENDATIONS
 ---------------
@@ -137,29 +119,20 @@ NOTES
             flag_status=analysis_results.get('flag', 'N/A'),
             status=analysis_results.get('status', 'N/A'),
             message=analysis_results.get('message', 'N/A'),
+            actual_thickness=actual_thickness,
+            governing_thickness=analysis_results.get('governing_thickness', 0),
+            governing_type=analysis_results.get('governing_type', 'Unknown'),
+            corrosion_allowance=analysis_results.get('corrosion_allowance', 'N/A'),
+            remaining_life=analysis_results.get('remaining_life_years', 'N/A'),
             nps=pipe_instance.nps,
             schedule=pipe_instance.schedule,
             pressure_class=pipe_instance.pressure_class,
             metallurgy=pipe_instance.metallurgy,
             pressure=pipe_instance.pressure,
-            pipe_config=pipe_instance.pipe_config,
             corrosion_rate=pipe_instance.corrosion_rate if pipe_instance.corrosion_rate else "Not specified",
-            measured_thickness=analysis_results.get('measured_thickness', 'N/A'),
-            year_inspected=analysis_results.get('year_inspected', 'N/A'),
-            actual_thickness=actual_thickness,
             tmin_pressure=analysis_results.get('tmin_pressure', 0),
             tmin_structural=analysis_results.get('tmin_structural', 0),
-            governing_thickness=analysis_results.get('governing_thickness', 0),
-            governing_type=analysis_results.get('governing_type', 'Unknown'),
-            retirement_limit=retirement_limit_str,
-            api574_RL=api574_RL,
-            pressure_adequate=pressure_adequate,
-            structural_adequate=structural_adequate,
-            retirement_status=retirement_status,
-            api574_status=api574_status,
-            above_api574=analysis_results.get('above_api574RL', 'N/A'),
-            below_retirement=analysis_results.get('below_defaultRL', 'N/A'),
-            life_span=analysis_results.get('life_span', 'N/A'),
+            api574_RL=analysis_results.get('api574_RL', 0),
             recommendations=recommendations,
             notes=notes
         )
@@ -535,70 +508,111 @@ Report Generated: {timestamp}
 | Governing Type | {analysis_results.get('governing_type', 'N/A')} | - |
 """)
         
-        # Python code cell for data visualization
-        code_content = f"""# Import required libraries
-import matplotlib.pyplot as plt
-import numpy as np
-from tmin.tmin.visualization import ThicknessVisualizer
+        # Python code cell for analysis summary
+        summary_content = f"""# Analysis Summary
+print("=== TMIN PIPE THICKNESS ANALYSIS ===")
+print(f"Flag: {analysis_results.get('flag', 'N/A')}")
+print(f"Status: {analysis_results.get('status', 'N/A')}")
+print(f"Message: {analysis_results.get('message', 'N/A')}")
 
-# Analysis data
-actual_thickness = {analysis_results.get('actual_thickness', 0)}
-tmin_pressure = {analysis_results.get('tmin_pressure', 0)}
-tmin_structural = {analysis_results.get('tmin_structural', 0)}
-governing_thickness = {analysis_results.get('governing_thickness', 0)}
-flag = "{analysis_results.get('flag', 'N/A')}"
-status = "{analysis_results.get('status', 'N/A')}"
-message = "{analysis_results.get('message', 'N/A')}"
-corrosion_allowance = {analysis_results.get('corrosion_allowance', 'None')}
-remaining_life_years = {analysis_results.get('remaining_life_years', 'None')}
+if {analysis_results.get('corrosion_allowance', 'None')} is not None:
+    print(f"Corrosion Allowance: {analysis_results.get('corrosion_allowance', 'None'):.4f} inches")
+if {analysis_results.get('remaining_life_years', 'None')} is not None:
+    print(f"Estimated Remaining Life: {analysis_results.get('remaining_life_years', 'None'):.1f} years")
 
-# Create a simple inline thickness comparison plot
-fig, ax = plt.subplots(figsize=(10, 6))
-
-# Prepare data
-categories = ['Actual', 'Pressure Min', 'Structural Min', 'Governing']
-values = [actual_thickness, tmin_pressure, tmin_structural, governing_thickness]
-colors = ['green' if actual_thickness >= val else 'red' for val in values]
-
-# Create bars
-bars = ax.bar(categories, values, color=colors, alpha=0.7)
-
-# Add value labels on bars
-for bar, value in zip(bars, values):
-    height = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2., height,
-           f'{{value:.4f}}"', ha='center', va='bottom')
-
-# Customize plot
-ax.set_ylabel('Thickness (inches)', fontsize=12)
-ax.set_title('TMIN - Thickness Comparison', fontsize=14, fontweight='bold')
-ax.grid(True, alpha=0.3, axis='y')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-plt.show()
-
-# Display analysis summary
-print(f"Analysis Flag: {{flag}}")
-print(f"Status: {{status}}")
-print(f"Message: {{message}}")
-
-if corrosion_allowance is not None:
-    print(f"Corrosion Allowance: {{corrosion_allowance:.4f}} inches")
-if remaining_life_years is not None:
-    print(f"Estimated Remaining Life: {{remaining_life_years:.1f}} years")
-
-# Display key thickness values
-print(f"\\nKey Thickness Values:")
-print(f"Actual Thickness: {{actual_thickness:.4f}} inches")
-print(f"Pressure Minimum: {{tmin_pressure:.4f}} inches")
-print(f"Structural Minimum: {{tmin_structural:.4f}} inches")
-print(f"Governing Thickness: {{governing_thickness:.4f}} inches")
+print(f"\\n=== KEY THICKNESS VALUES ===")
+print(f"Actual Thickness: {analysis_results.get('actual_thickness', 0):.4f} inches")
+print(f"Pressure Minimum: {analysis_results.get('tmin_pressure', 0):.4f} inches")
+print(f"Structural Minimum: {analysis_results.get('tmin_structural', 0):.4f} inches")
+print(f"Governing Thickness: {analysis_results.get('governing_thickness', 0):.4f} inches")
 """
         
-        code_cell = nbf.v4.new_code_cell(code_content)
+        summary_cell = nbf.v4.new_code_cell(summary_content)
+        
+        # Python code cell to define analysis_results dictionary
+        data_content = f"""# Define analysis data
+analysis_results = {{
+    'actual_thickness': {analysis_results.get('actual_thickness', 0)},
+    'tmin_pressure': {analysis_results.get('tmin_pressure', 0)},
+    'tmin_structural': {analysis_results.get('tmin_structural', 0)},
+    'governing_thickness': {analysis_results.get('governing_thickness', 0)},
+    'governing_type': '{analysis_results.get('governing_type', 'N/A')}',
+    'flag': '{analysis_results.get('flag', 'N/A')}',
+    'status': '{analysis_results.get('status', 'N/A')}',
+    'message': '{analysis_results.get('message', 'N/A')}',
+    'corrosion_allowance': {analysis_results.get('corrosion_allowance', 'None')},
+    'remaining_life_years': {analysis_results.get('remaining_life_years', 'None')},
+    'api574_RL': {analysis_results.get('api574_RL', 0)},
+    'default_retirement_limit': {analysis_results.get('default_retirement_limit', 'None')},
+    'measured_thickness': {analysis_results.get('measured_thickness', 0)},
+    'year_inspected': {analysis_results.get('year_inspected', 'None')},
+    'month_inspected': {analysis_results.get('month_inspected', 'None')}
+}}
+
+actual_thickness = {analysis_results.get('actual_thickness', 0)}
+"""
+        
+        data_cell = nbf.v4.new_code_cell(data_content)
+        
+        # Python code cell for comparison chart
+        comparison_content = f"""# Generate Comparison Chart
+from tmin.visualization import ThicknessVisualizer
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Create visualizer and generate comparison chart
+visualizer = ThicknessVisualizer()
+comparison_chart_path = visualizer.create_comparison_chart(analysis_results, actual_thickness)
+print(f"Comparison chart saved: {{comparison_chart_path}}")
+
+# Display the comparison chart inline
+img = Image.open(comparison_chart_path)
+plt.figure(figsize=(12, 8))
+plt.imshow(img)
+plt.axis('off')
+plt.title('TMIN - Thickness Comparison Chart', fontsize=16, fontweight='bold')
+plt.tight_layout()
+plt.show()
+"""
+        
+        comparison_cell = nbf.v4.new_code_cell(comparison_content)
+        
+        # Python code cell for thickness number line
+        number_line_content = f"""# Generate Thickness Number Line
+from tmin.visualization import ThicknessVisualizer
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Create visualizer and generate number line
+visualizer = ThicknessVisualizer()
+
+# Create a simple pipe instance for the visualization
+# The function has fallback logic if pipe dimensions can't be determined
+class SimplePipe:
+    def get_ID(self):
+        return 0.0
+    def get_OD(self):
+        return {analysis_results.get('measured_thickness', 0)} + 0.02
+
+pipe_instance = SimplePipe()
+
+number_line_path = visualizer.create_thickness_number_line(pipe_instance, analysis_results, actual_thickness)
+print(f"Number line visualization saved: {{number_line_path}}")
+
+# Display the number line inline
+img = Image.open(number_line_path)
+plt.figure(figsize=(14, 10))
+plt.imshow(img)
+plt.axis('off')
+plt.title('TMIN - Pipe Wall Thickness Analysis', fontsize=16, fontweight='bold')
+plt.tight_layout()
+plt.show()
+"""
+        
+        number_line_cell = nbf.v4.new_code_cell(number_line_content)
         
         # Add cells to notebook
-        nb.cells = [title_cell, specs_cell, results_cell, code_cell]
+        nb.cells = [title_cell, specs_cell, results_cell, data_cell, summary_cell, comparison_cell, number_line_cell]
         
         # Write notebook file
         nbf.write(nb, filepath)

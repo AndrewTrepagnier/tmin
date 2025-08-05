@@ -27,17 +27,35 @@ Many oil and gas companies are faced with maintaining thousands of miles of 100+
 pip install tmin
 ```
 
+### Basic Example:
+
+```python
+from tmin.core import PIPE
+
+# Create pipe instance
+pipe = PIPE(
+    nps="2",
+    schedule="40", 
+    pressure=50.0,
+    pressure_class=150,
+    metallurgy="Intermediate/Low CS",
+    corrosion_rate=10.0
+)
+
+# Analyze thickness and generate report
+results = pipe.analysis(measured_thickness=0.188)
+report = pipe.report("TXT")  # Options: "CSV", "JSON", "TXT", "IPYNB"
+
+print(f"Flag: {results['flag']}")
+print(f"Status: {results['status']}")
+print(f"Report saved: {report['file_path']}")
+```
 
 ### Suppose the following scenario:
 
    <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/1f87dcb1-7d17-4c25-888b-6d9131098ec0"/>
 
-
-
 RT findings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
-
-
-
 
 **The Previous Way:** time consuming handwritten calculations, tedious code book lookups, and hours of typing full assessment reports
 
@@ -142,7 +160,7 @@ python -m pytest tests/test_core.py -v
 ## Need Help?
 
 **Documentation:** Built-in help with `tmin --help`
-**Examples:** See `example_pipe_config.toml`
+**Examples:** See `tutorials/python_scripts/basic_example.py`
 **Contact:** andrew[dot]trepagnier[at]icloud[dot]com
 
 ---
