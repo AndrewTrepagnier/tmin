@@ -8,7 +8,7 @@
 [![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
 ![License](https://img.shields.io/pypi/l/tmin)
 [![Blog](https://img.shields.io/badge/Updates-blog-purple)](https://your-blog-link.com)
-[![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://your-blog-link.com)
+[![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://[your-blog-link.com](https://github.com/AndrewTrepagnier/tmin/wiki))
 [![Blog](https://img.shields.io/badge/Important-DesignDoc-pink)](https://your-blog-link.com)
 
 TMIN is an open source software designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
