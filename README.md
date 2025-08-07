@@ -11,7 +11,7 @@
 [![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://github.com/AndrewTrepagnier/tmin/wiki)
 [![Blog](https://img.shields.io/badge/Important-DesignDoc-pink)](https://your-blog-link.com)
 
-TMIN is an open source software designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
+TMIN (an abbreviation for "minimum thickness") is an open source software designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
 
 Many oil and gas companies are faced with maintaining thousands of miles of 100+ year old piping networks supporting multi-million dollar/year processing operations. There is rarely a simple solution to immediately shutdown a process pipe - as these shutdowns more often than not impact other units and cost companies millions in time and resources.
 
