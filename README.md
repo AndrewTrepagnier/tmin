@@ -57,7 +57,7 @@ pipe = PIPE(
 results = pipe.analysis(
     measured_thickness=0.188,
     year_inspected=2024,
-    month_inspected=6
+    month_inspected=6 # Last Inspection July, 2024 
 )
 report = pipe.report("TXT")  # Options: "CSV", "JSON", "TXT", "IPYNB"
 
@@ -75,8 +75,37 @@ print(f"Number line visualization: {number_line}")
 
 **Results:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
 
+<img width="2170" height="1342" alt="20250807_060427_thickness_analysis_number_line" src="https://github.com/user-attachments/assets/a086ba5a-00b6-45ce-999f-dbbc0b592234" />
+
+<img width="2170" height="1342" alt="20250807_060427_thickness_comparison_chart" src="https://github.com/user-attachments/assets/c972ef35-f994-4700-a0ad-3ea905f6e25f" />
+Text File of Full Report:
 
 
+```
+
+TMIN - PIPE THICKNESS ANALYSIS REPORT
+=====================================
+
+Report Generated: 2025-08-07 06:04:27
+Analysis ID: TMIN_20250807_060427
+
+FLAG STATUS: GREEN
+Status: SAFE_TO_CONTINUE
+
+EXECUTIVE SUMMARY
+-----------------
+All criteria satisfied - pipe can safely continue in operation
+
+KEY FINDINGS
+------------
+• Actual Thickness: 0.1740 inches
+• Governing Thickness: 0.0500 inches (structural)
+• Corrosion Allowance: 0.12399999999999999 inches
+• Estimated Remaining Life: 10.333333333333332 years
+.
+.
+.
+```
 
 ## Why TMIN
 
