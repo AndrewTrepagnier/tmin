@@ -29,58 +29,53 @@ pip install tmin
 
 ### Basic Example:
 
-```python
-from tmin.core import PIPE
-
-# Create pipe instance
-pipe = PIPE(
-    nps="2",
-    schedule="40", 
-    pressure=50.0,
-    pressure_class=150,
-    metallurgy="Intermediate/Low CS",
-    corrosion_rate=10.0
-)
-
-# Analyze thickness and generate report
-results = pipe.analysis(measured_thickness=0.188)
-report = pipe.report("TXT")  # Options: "CSV", "JSON", "TXT", "IPYNB"
-
-print(f"Flag: {results['flag']}")
-print(f"Status: {results['status']}")
-print(f"Report saved: {report['file_path']}")
-```
-
-### Suppose the following scenario:
+Suppose the following scenario:
 
    <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/1f87dcb1-7d17-4c25-888b-6d9131098ec0"/>
 
 RT findings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
 
-**The Previous Way:** time consuming handwritten calculations, tedious code book lookups, and hours of typing full assessment reports
-
-**With TMIN:** One Python script, instant answers.
+TMIN can will preform calculations, create visuals, and generate a full assessment report - with only three python functions.
 
 ```python
-import tmin
+from tmin.core import PIPE
+from tmin.visualization import ThicknessVisualizer
 
 # Create pipe instance
-pipe = tmin.PIPE(
-    schedule="40",
-    nps="2", 
-    pressure=50.0,
+pipe = PIPE(
+    nps=2,
+    schedule=40, 
+    pressure=300.0,
     pressure_class=150,
     metallurgy="Intermediate/Low CS",
-    allowable_stress=23333.0
+    corrosion_rate=12.0,
+    yield_stress=33000.0,  # 33 ksi for ~22 ksi allowable stress
+    design_temp=600.0
 )
 
-# Analyze thickness
-results = pipe.analysis(measured_thickness=0.060)
-print(f"Safe to operate: {results['actual_thickness'] > results['governing_thickness']}")
-print(f"Remaining life: {results['life_span']} years")
+# Analyze thickness and generate report
+results = pipe.analysis(
+    measured_thickness=0.188,
+    year_inspected=2024,
+    month_inspected=6
+)
+report = pipe.report("TXT")  # Options: "CSV", "JSON", "TXT", "IPYNB"
+
+# Create visualizations
+visualizer = ThicknessVisualizer()
+comparison_chart = visualizer.create_comparison_chart(results, 0.188)
+number_line = visualizer.create_thickness_number_line(pipe, results, 0.188)
+
+print(f"Flag: {results['flag']}")
+print(f"Status: {results['status']}")
+print(f"Report saved: {report['file_path']}")
+print(f"Comparison chart: {comparison_chart}")
+print(f"Number line visualization: {number_line}")
 ```
 
-**Result:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
+**Results:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
+
+
 
 
 ## Why TMIN
