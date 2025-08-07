@@ -433,7 +433,7 @@ class PIPE:
     #     }
     
     def analysis(self, measured_thickness : float, year_inspected : Optional[int] = None, month_inspected : Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
-                 joint_type = 'seamless'):
+                 joint_type = 'Seamless'):
 
         """
         The intent of analysis is to determine the present-day nominal thickness lies on the overall, 'like-new' pipe wall thickness and compare it to industry standards to assess if it is safe to lower the retirement limit and elongate the pipe's operational life.
