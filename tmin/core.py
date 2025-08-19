@@ -301,6 +301,9 @@ class PIPE:
         if default_retirement_limit is not None and default_retirement_limit < self.get_structural_thickness_requirement():
             raise ValueError(f"Default, company-specific retirement limits shall not be below API {self.API_table} appointed structural thickness requirements")
 
+        if measured_thickness > self.outer_diameter - self.inner_diameter:
+            raise ValueError(f"Measured thickness cannot be greater than nominal pipe wall thickness: units should be in inches")
+            
         ###############################
         # Time-Based Corrosion Analysis
         ###############################

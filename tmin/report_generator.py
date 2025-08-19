@@ -156,7 +156,7 @@ class ReportGenerator:
 
                 print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
                 print(f"Fitness for Service (FFS) assessment may be needed for higher confidence")
-
+                
 ######################################################################################################## TODO: write logic to handle struct deficit if available, if not ignore
 
             else: #self.flag_status == 'RED':
