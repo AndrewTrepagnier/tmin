@@ -247,193 +247,14 @@ class PIPE:
         return f"{year}-{month_str}"
     
 
-    # Old functions commented out for clarity and reference
 
 
-    # def percent_RL(self, actual_thickness):
-    #     """
-    #     Calculate percentage of retirement limit (Table 5) remaining
-    #     RL = actual thickness / retirement limit from Table 5
-    #     """
-    #     RL = self.table5_1_RL.get(self.nps)
-    #     if RL is None:
-    #         raise ValueError(f"No retirement limit available for NPS {self.nps}")
-    #     percent_remaining = (actual_thickness / RL) * 100
-    #     return percent_remaining
 
-    # def check_RL_status(self, actual_thickness):
-    #     """
-    #     Check if pipe meets retirement limit requirements
-    #     Returns status and percentage remaining
-    #     """
-    #     RL = self.table5_1_RL.get(self.nps)
-    #     if RL is None:
-    #         return {"status": "No RL data", "percent_remaining": None}
-    #     percent_remaining = (actual_thickness / RL) * 100
-    #     if actual_thickness >= RL:
-    #         status = "Above RL"
-    #     else:
-    #         status = "Below RL - Consider Retirement"
-    #     return {
-    #             "status": status,
-    #             "retirement_limit": RL,
-    #             "actual_thickness": actual_thickness,
-    #             "percent_remaining": percent_remaining
-    #         }
 
-    # def compare_thickness(self, actual_thickness, temp_f=1000, joint_type='Seamless'):
-    #     """
-    #     Comprehensive thickness analysis comparing actual vs calculated t-min and RL
-    #     Returns comparison metrics for both pressure design and retirement limit
-    #     """
-    #     # Calculate pressure design requirements
-    #     tmin = self.calculate_tmin_pressure(temp_f, joint_type)
-    #     tmin_excess = actual_thickness - tmin
-    #     tmin_percent_excess = (tmin_excess / actual_thickness) * 100
-    #     # Check retirement limit
-    #     rl_status = self.check_RL_status(actual_thickness)
-    #     return {
-    #             'actual_thickness': actual_thickness,
-    #             'calculated_tmin': tmin,
-    #             'tmin_excess': tmin_excess,
-    #             'tmin_percent_excess': tmin_percent_excess,
-    #             'rl_status': rl_status['status'],
-    #             'retirement_limit': rl_status['retirement_limit'],
-    #             'rl_percent_remaining': rl_status['percent_remaining'],
-    #             'pressure_design_adequate': tmin_excess > 0,
-    #             'rl_adequate': actual_thickness >= rl_status['retirement_limit'] if rl_status['retirement_limit'] else None
-    #         }
 
-    #####################################################################################
-    # ANALYSIS
-    ####################################################################################
-
-    # def analysis(self, measured_thickness: float, year_inspected: Optional[int] = None, 
-    #              month_inspected: Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
-    #              joint_type: Literal['Seamless', 'Welded'] = 'Seamless'):
-    #     """
-    #     Analyze pipe thickness against pressure and structural requirements
-        
-    #     Args:
-    #         measured_thickness: Thickness measured during inspection (inches)
-    #         year_inspected: Year when thickness was measured (e.g., 2020)
-    #         month_inspected: Month when thickness was measured (1-12, e.g., 1 for January, 12 for December)
-    #         joint_type: Joint type for calculations ('Seamless' or 'Welded')
-            
-    #     Returns:
-    #         Dict with analysis results and governing factor
-            
-    #     Raises:
-    #         ValueError: If inspection year is in the future or invalid parameters
-            
-    #     Example:
-    #         >>> pipe = PIPE(nps=2.0, pressure_class=300, corrosion_rate=15.0, ...)
-    #         >>> # High corrosion rate - month precision matters
-    #         >>> results = pipe.analysis(0.25, 2024, 6)  # June 2024 inspection
-    #         >>> # vs
-    #         >>> results = pipe.analysis(0.25, 2024, 12)  # December 2024 inspection
-    #         >>> # 6 months difference with 15 MPY = 7.5 mils difference in degradation
-    #     """
-        
-    #     # Edge Case Error Messages
-    #     if month_inspected is not None and not (1 <= month_inspected <= 12):
-    #         raise ValueError(f"Month must be between 1 and 12, got {month_inspected}")
-        
-    #     if year_inspected is not None and year_inspected < 1900:
-    #         raise ValueError(f"Year must be reasonable, got {year_inspected}")
-
-    #     # Calculate present-day actual thickness based on inspection year and corrosion rate
-    #     if year_inspected is not None and self.corrosion_rate is not None:
-    #         # Calculate precise time elapsed including months for high corrosion rates
-    #         time_elapsed = self._calculate_time_elapsed(year_inspected, month_inspected)
-    #         inspection_date_str = self._format_inspection_date(year_inspected, month_inspected)
-            
-    #         degradation = self.corrosion_rate * time_elapsed  # Returns the amount of degradation (in Mils) since last inspection, assuming uniform, linear corrosion
-            
-    #         actual_thickness = measured_thickness - self.mils_to_inches(degradation)  # Last known thickness minus the amount of degradation gives true, present-day pipe wall thickness
-            
-    #         print(f"Time-based corrosion calculation:")
-    #         if time_elapsed < 0.1:  # Less than ~1.2 months
-    #             print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
-    #             print(f"  Corrosion rate: {self.corrosion_rate} MPY")
-    #         else:
-    #             print(f"  Measured thickness: {measured_thickness:.4f} inches ({inspection_date_str})")
-    #             print(f"  Corrosion rate: {self.corrosion_rate} MPY")
-    #             print(f"  Time elapsed: {time_elapsed:.3f} years ({time_elapsed*12:.1f} months)")
-    #             print(f"  Amount of Degradation since {inspection_date_str}: {self.mils_to_inches(degradation):.4f} inches (or {degradation:.1f} Mils)")
-    #             print(f"  Present-day thickness: {actual_thickness:.4f} inches (or {self.inches_to_mils(actual_thickness)} Mils)")
-
-        
-    #     else:
-    #         actual_thickness = measured_thickness
-    #         print(f"Using measured thickness as present-day thickness: {actual_thickness:.4f} inches")
-        
-    #     #### Checked 
-
-    #     tmin_pressure = self.get_pressure_thickness_requirement(joint_type)
-    #     tmin_structural = self.get_structural_thickness_requirement()
-
-        
-    #     default_retirement_limit = self.default_retirement_limit # Optional user-defined, company-specific retirement limit
-        
-    #     limits = {
-    #         "pressure": tmin_pressure,
-    #         "structural": tmin_structural,
-    #     }
-
-    #     # This conditional take the larger of the two required thicknesses, this will determine whether the pipe is structurally governed or pressure governed
-    #     if limits["pressure"] >= limits["structural"]:
-    #         governing_thickness = limits["pressure"]
-    #         governing_type = "pressure" 
-            
-    #     else:
-    #         governing_thickness = limits["structural"]
-    #         governing_type = "structural"
-
-    #     print("----------- THICKNESS REQUIREMENT ----------")
-    #     print(f"The pipe is {governing_type} thickness governed, pipe retirement is required at {governing_thickness} inches ({self.inches_to_mils(governing_thickness)} Mils)")
-    #     print("-----------------------------------------------------")
-        
-    #     if default_retirement_limit is not None:
-    #         if default_retirement_limit - actual_thickness >= 0:
-    #             below_defaultRL = default_retirement_limit - actual_thickness
-    #         else:
-    #             print(f"The actual thickness is greater than default (company-specified) retirement limit by {actual_thickness - default_retirement_limit}")
-    #             below_defaultRL = None
-    #     else:
-    #         below_defaultRL = None
-        
-    #     if governing_type == "structural":
-            
-    #         api574_value = self.get_structural_thickness_requirement()
-    #         if api574_value < actual_thickness:
-    #             corosion_allowance = actual_thickness - api574_value
-    #             print(f"There is {corosion_allowance} inches ({self.inches_to_mils(corosion_allowance)} Mils) of corrosion allowance remaining")
-    #         else:
-    #             print(f"Actual Thickness is {api574_value - actual_thickness} inches below corresponding API 574 Structural Retirement Limit for {self.metallurgy}, Retirement Recommended, Fit For Service assessment is needed")
-    #             corosion_allowance = None
-
-    #     else:
-    #         if governing_thickness >= actual_thickness:
-    #             print(f"Actual Thickness is {governing_thickness - actual_thickness} inches ({self.inches_to_mils(governing_thickness - actual_thickness)} Mils), Retire Pipe Immediately, miniumum pressure containing thickness is not satisfied")
-        
-    #     return {
-    #         "measured_thickness": measured_thickness,
-    #         "year_inspected": year_inspected,
-    #         "actual_thickness": actual_thickness,
-    #         "tmin_pressure": tmin_pressure,
-    #         "tmin_structural": tmin_structural,
-    #         "default_retirement_limit": default_retirement_limit,
-    #         "below_defaultRL": below_defaultRL,
-    #         "api574_RL": self.get_structural_thickness_requirement(),
-    #         "above_api574RL": corosion_allowance,
-    #         "life_span": self.calculate_corrosion_allowance(corosion_allowance, self.corrosion_rate) if corosion_allowance is not None and self.corrosion_rate is not None else None,
-    #         "governing_thickness": governing_thickness,
-    #         "governing_type": governing_type,
-    #     }
     
     def analysis(self, measured_thickness : float, year_inspected : Optional[int] = None, month_inspected : Optional[Literal[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]] = None, 
-                 joint_type = 'Seamless'):
+                 joint_type = 'Seamless') -> Dict:
 
         """
         The intent of analysis is to determine the present-day nominal thickness lies on the overall, 'like-new' pipe wall thickness and compare it to industry standards to assess if it is safe to lower the retirement limit and elongate the pipe's operational life.
@@ -522,11 +343,11 @@ class PIPE:
             governing_thickness = limits["structural"]
             governing_type = "structural"
 
-        ###############################
-        # Raise Flag (Green, Yellow, Red)
-        ###############################
+        #######################################
+        # Pack Analysis Results in a Dictionary
+        #######################################
 
-        # Store analysis data for flag methods
+        # Stores the analysis data in a dict, we can unpack this as needed for flag methods deeper in the class
         analysis_data = {
             "measured_thickness": measured_thickness,
             "year_inspected": year_inspected,
@@ -540,32 +361,49 @@ class PIPE:
             "limits": limits
         }
 
+
+        ######################################################################################
+        # Raise Flag (Green, Yellow, Red), this is where the logic decides if the pipe is safe
+        ######################################################################################
+
+
         # RED FLAG: Below pressure minimum - Immediate retirement required
         if actual_thickness <= limits["pressure"]:
-            result = self.red_flag(analysis_data)
+            raised_flag = self.red_flag(analysis_data)
         
         # YELLOW FLAG: Above pressure but below structural or default retirement limit
         elif (actual_thickness > limits["pressure"] and 
               (actual_thickness <= limits["structural"] or 
                (default_retirement_limit is not None and actual_thickness <= default_retirement_limit and actual_thickness > limits["pressure"]))):
-            result = self.yellow_flag(analysis_data)
+            raised_flag = self.yellow_flag(analysis_data)
         
         # GREEN FLAG: Above all limits - Safe to continue operation
         else:
-            result = self.green_flag(analysis_data)
+            raised_flag = self.green_flag(analysis_data)
         
         # Store results for caching
         self._last_analysis_results = result
+
         return result
+
+
+
             
+        #############################################################################################
+        # GREEN FLAG METHOD
+        #############################################################################################
+
+
+
+
+
+
     def green_flag(self, analysis_data):
         """Green Flag: All criteria satisfied - pipe can safely continue in operation"""
-        print(f"###################################")
-        print(f"GREEN FLAG")
-        print(f"###################################")
+        
 
-        print(f"Criteria Satisfied per API {self.API_table} / ASME Code")
-        print(f"Piping can safely continue in operation")
+        # Unpack the actual thickness, governing thickness, and default RL to identify green flag's retirement limit
+        # This is only applicable to green flags since red and yellow require more specialized considerations (e.g. FFS)
         
         actual_thickness = analysis_data["actual_thickness"]
         governing_thickness = analysis_data["governing_thickness"]
@@ -580,10 +418,9 @@ class PIPE:
             retirement_type = f"New Retirement limit is governed by {analysis_data['governing_type']} design"
         
         corrosion_allowance = actual_thickness - next_retirement_limit
-        
-        print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
-        print(f"Next retirement limit ({retirement_type}): {next_retirement_limit:.4f} inches ({self.inches_to_mils(next_retirement_limit):.1f} mils)")
-        print(f"Corrosion allowance: {corrosion_allowance:.4f} inches ({self.inches_to_mils(corrosion_allowance):.1f} mils)")
+
+
+
         
         # Calculate remaining life if corrosion rate is provided
         if self.corrosion_rate is not None:
@@ -600,15 +437,23 @@ class PIPE:
             "remaining_life_years": remaining_life_years if self.corrosion_rate is not None else None,
             **analysis_data
         }
+
+
+
+
+            
+        #############################################################################################
+        # YELLOW FLAG METHOD
+        #############################################################################################
+
+
+
+
+        
     
     def yellow_flag(self, analysis_data):
         """Yellow Flag: Not all criteria satisfied - FFS assessment recommended"""
-        print(f"###################################")
-        print(f"YELLOW FLAG")
-        print(f"###################################")
         
-        print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
-        print(f"Fitness for Service (FFS) assessment recommended")
         
         actual_thickness = analysis_data["actual_thickness"]
         tmin_pressure = analysis_data["tmin_pressure"]
@@ -619,17 +464,16 @@ class PIPE:
         below_structural = actual_thickness <= tmin_structural
         below_default = default_retirement_limit is not None and actual_thickness <= default_retirement_limit
         
-        print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
+        
         
         if below_structural:
             structural_deficit = tmin_structural - actual_thickness
-            print(f"Below structural minimum by: {structural_deficit:.4f} inches ({self.inches_to_mils(structural_deficit):.1f} mils)")
+            
         
         if below_default:
             default_deficit = default_retirement_limit - actual_thickness
-            print(f"Below company retirement limit by: {default_deficit:.4f} inches ({self.inches_to_mils(default_deficit):.1f} mils)")
+            
         
-        print(f"Engineering judgment and FFS assessment required for continued operation")
         
         return {
             "flag": "YELLOW",
@@ -642,24 +486,30 @@ class PIPE:
             **analysis_data
         }
     
+
+
+
+
+            
+        #############################################################################################
+        # RED FLAG METHOD
+        #############################################################################################
+
+
+
+
+
+
+
     def red_flag(self, analysis_data):
         """Red Flag: Below pressure minimum - Immediate retirement required"""
-        print(f"###################################")
-        print(f"RED FLAG")
-        print(f"###################################")
         
-        print(f"CRITICAL: Below pressure minimum thickness requirement")
-        print(f"IMMEDIATE RETIREMENT REQUIRED")
         
         actual_thickness = analysis_data["actual_thickness"]
         tmin_pressure = analysis_data["tmin_pressure"]
         pressure_deficit = tmin_pressure - actual_thickness
         
-        print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
-        print(f"Pressure minimum required: {tmin_pressure:.4f} inches ({self.inches_to_mils(tmin_pressure):.1f} mils)")
-        print(f"Deficit: {pressure_deficit:.4f} inches ({self.inches_to_mils(pressure_deficit):.1f} mils)")
-        print(f"Rigorous analysis required for any continued operations")
-        print(f"Consider temporary leak detection devices if operation must continue")
+        
         
         return {
             "flag": "RED",
@@ -668,6 +518,8 @@ class PIPE:
             "pressure_deficit": pressure_deficit,
             **analysis_data
         }
+
+
 
 
 
