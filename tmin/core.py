@@ -115,7 +115,7 @@ class PIPE:
     # Pressure Contianing Thickness Requirements Per ASME B31.3 Codes
     #####################################################################################
 
-    def get_pressure_thickness_requirement(self, joint_type='Seamless') -> float:
+    def tmin_pressure(self, joint_type='Seamless') -> float:
         """
         Calculate minimum wall thickness for pressure design
         Based on ASME B31.1 Para. 304.1.2a Eq. 3a
@@ -167,7 +167,7 @@ class PIPE:
     # Structural Thickness Requirements Per API 574 Codes
     #####################################################################################
 
-    def get_structural_thickness_requirement(self) -> float:
+    def tmin_structural(self) -> float:
         """
         Get minimum structural thickness requirement from API 574 tables.
         
@@ -303,7 +303,7 @@ class PIPE:
 
         if measured_thickness > self.outer_diameter - self.inner_diameter:
             raise ValueError(f"Measured thickness cannot be greater than nominal pipe wall thickness: units should be in inches")
-            
+
         ###############################
         # Time-Based Corrosion Analysis
         ###############################
@@ -316,10 +316,10 @@ class PIPE:
             
             degradation = self.corrosion_rate * time_elapsed  # Returns the amount of degradation (in Mils) since last inspection, assuming uniform, linear corrosion
             
-            actual_thickness = measured_thickness - self.mils_to_inches(degradation)  # Last known thickness minus the amount of degradation gives true, present-day pipe wall thickness
+            self.actual_thickness = measured_thickness - self.mils_to_inches(degradation)  # Last known thickness minus the amount of degradation gives true, present-day pipe wall thickness
 
         else:
-            actual_thickness = measured_thickness
+            self.actual_thickness = measured_thickness
             # print(f"Using measured thickness as present-day thickness: {actual_thickness:.4f} inches")
 
 
@@ -327,42 +327,28 @@ class PIPE:
         # Governing Thickness Analysis (Pressure Vs. Structural)
         ###############################
 
+        #Running the tmin methods and saving them as arguments that can be used globally now
+        self.tmin_pressure = tmin_pressure('seamless')   
+        self.tmin_structural = tmin_structural()
 
-        tmin_pressure = self.get_pressure_thickness_requirement(joint_type)
-        tmin_structural = self.get_structural_thickness_requirement()
-
-        
-        limits = {
-            "pressure": tmin_pressure,
-            "structural": tmin_structural,
-        }
 
         # This conditional take the larger of the two required thicknesses, this will determine whether the pipe is structurally governed or pressure governed
-        if limits["pressure"] >= limits["structural"]:
-            governing_thickness = limits["pressure"]
-            governing_type = "pressure" 
+        
+        if self.tmin_pressure >= self.tmin_structural:
+            self.governing_thickness = self.tmin_pressure 
+            self.governing_type = "pressure" 
             
         else:
-            governing_thickness = limits["structural"]
-            governing_type = "structural"
+            self.governing_thickness = self.tmin_structural
+            self.governing_type = "structural"
+
+
+
 
         #######################################
         # Pack Analysis Results in a Dictionary
         #######################################
 
-        # Stores the analysis data in a dict, we can unpack this as needed for flag methods deeper in the class
-        analysis_data = {
-            "measured_thickness": measured_thickness,
-            "year_inspected": year_inspected,
-            "month_inspected": month_inspected,
-            "actual_thickness": actual_thickness,
-            "tmin_pressure": tmin_pressure,
-            "tmin_structural": tmin_structural,
-            "default_retirement_limit": default_retirement_limit,
-            "governing_thickness": governing_thickness,
-            "governing_type": governing_type,
-            "limits": limits
-        }
 
 
         ######################################################################################
@@ -388,6 +374,19 @@ class PIPE:
         self._last_analysis_results = result
 
         return result
+
+        return pack_analysis_data = {
+            "measured_thickness": measured_thickness,
+            "year_inspected": year_inspected,
+            "month_inspected": month_inspected,
+            "actual_thickness": actual_thickness,
+            "tmin_pressure": tmin_pressure,
+            "tmin_structural": tmin_structural,
+            "default_retirement_limit": default_retirement_limit,
+            "governing_thickness": governing_thickness,
+            "governing_type": governing_type,
+            "limits": limits,
+            **raised_flag}
 
 
 

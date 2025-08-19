@@ -154,13 +154,16 @@ class ReportGenerator:
 
             elif self.flag_status == 'YELLOW':
 
+                
+
                 print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
                 print(f"Fitness for Service (FFS) assessment may be needed for higher confidence")
-                
-######################################################################################################## TODO: write logic to handle struct deficit if available, if not ignore
+
 
             else: #self.flag_status == 'RED':
 
+                print(f"CRITICAL: Below pressure minimum thickness requirement")
+                print(f"Immediate Retirement is recommended. Risk-based assessment and FFS is needed for continued operation.")
 
 
     
