@@ -89,7 +89,8 @@ class ReportGenerator:
 
     def quick_report(self) -> str:
 
-        #filehandler method must be ran prior to this
+        # filehandler method must be ran prior to this
+        # This is a standard template that works for any flag and will provide users with a brief output in additon to the full reports 
 
         retrieve_str = """
 
@@ -113,7 +114,7 @@ class ReportGenerator:
 
         ANALYSIS FINDINGS:
         ------------------
-        • Actual Thickness: {actual_thickness:.4f} inches
+        • Actual (Current-day) Thickness: {actual_thickness:.4f} inches
         • Governing Thickness: {governing_thickness:.4f} inches ({governing_type})
         • Corrosion Allowance: {corrosion_allowance} inches
         • Estimated Remaining Life: {remaining_life} years
@@ -146,11 +147,17 @@ class ReportGenerator:
 
             if self.flag_status == 'GREEN':
 
-                
+                print(f"Criteria Satisfied per API {self.API_table} / ASME Code")
+                print(f"Piping can safely continue in operation")
+                print(f"The next retirement limit is governed by {retirement_type} at {next_retirement_limit} inches (or {self.inches_to_mils(self.next_retirement_limit)} MPY)")
 
 
-                
             elif self.flag_status == 'YELLOW':
+
+                print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
+                print(f"Fitness for Service (FFS) assessment may be needed for higher confidence")
+
+######################################################################################################## TODO: write logic to handle struct deficit if available, if not ignore
 
             else: #self.flag_status == 'RED':
 

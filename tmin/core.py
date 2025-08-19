@@ -425,7 +425,7 @@ class PIPE:
         # Calculate remaining life if corrosion rate is provided
         if self.corrosion_rate is not None:
             remaining_life_years = self.calculate_corrosion_allowance(corrosion_allowance, self.corrosion_rate)
-            print(f"Estimated remaining life: {remaining_life_years:.1f} years (at {self.corrosion_rate} MPY)")
+            # print(f"Estimated remaining life: {remaining_life_years:.1f} years (at {self.corrosion_rate} MPY)")
         
         return {
             "flag": "GREEN",
