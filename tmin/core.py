@@ -333,7 +333,7 @@ class PIPE:
 
 
         # This conditional take the larger of the two required thicknesses, this will determine whether the pipe is structurally governed or pressure governed
-        
+
         if self.tmin_pressure >= self.tmin_structural:
             self.governing_thickness = self.tmin_pressure 
             self.governing_type = "pressure" 
@@ -343,7 +343,7 @@ class PIPE:
             self.governing_type = "structural"
 
 
-
+################################################################# TODO rewrite in a stateless function form
 
         #######################################
         # Pack Analysis Results in a Dictionary
@@ -373,8 +373,7 @@ class PIPE:
         # Store results for caching
         self._last_analysis_results = result
 
-        return result
-
+        # TODO: This still requires extensive work
         return pack_analysis_data = {
             "measured_thickness": measured_thickness,
             "year_inspected": year_inspected,
@@ -400,28 +399,27 @@ class PIPE:
 
 
 
-    def green_flag(self, analysis_data):
+    def green_flag(self):
         """Green Flag: All criteria satisfied - pipe can safely continue in operation"""
         
 
         # Unpack the actual thickness, governing thickness, and default RL to identify green flag's retirement limit
         # This is only applicable to green flags since red and yellow require more specialized considerations (e.g. FFS)
         
-        actual_thickness = analysis_data["actual_thickness"]
-        governing_thickness = analysis_data["governing_thickness"]
-        default_retirement_limit = analysis_data["default_retirement_limit"]
+        # actual_thickness, efault_retirement limit, governing_thickness, governing_type, tmin_pressure, and tmin_struct need are the attributes that require selfs to use in this method
         
         # Determine next retirement limit (whichever is higher: governing thickness or default RL)
-        if default_retirement_limit is not None and default_retirement_limit > governing_thickness:
-            next_retirement_limit = default_retirement_limit
+        if self.default_retirement_limit is not None and self.default_retirement_limit > self.governing_thickness:
+            next_retirement_limit = self.default_retirement_limit
             retirement_type = "company-specified"
+
         else:
-            next_retirement_limit = governing_thickness
+            next_retirement_limit = self.governing_thickness
             retirement_type = f"New Retirement limit is governed by {analysis_data['governing_type']} design"
         
-        corrosion_allowance = actual_thickness - next_retirement_limit
+        self.corrosion_allowance = self.actual_thickness - next_retirement_limit
 
-
+######################## TODO: beginning of the method, just say self.something = something instead of clutering everything
 
         
         # Calculate remaining life if corrosion rate is provided
