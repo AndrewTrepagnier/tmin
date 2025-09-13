@@ -41,3 +41,31 @@ build:  ## Build package
 
 run-tests:  ## Run tests using the test runner script
 	python run_tests.py
+
+# Docker commands
+docker-build:  ## Build all Docker images
+	./docker.sh build
+
+docker-test:  ## Run tests in fresh Docker container
+	./docker.sh test
+
+docker-test-cov:  ## Run tests with coverage in fresh Docker container
+	./docker.sh test-cov
+
+docker-dev:  ## Start development Docker container
+	./docker.sh dev
+
+docker-shell:  ## Open shell in development Docker container
+	./docker.sh shell
+
+docker-lint:  ## Run linting in fresh Docker container
+	./docker.sh lint
+
+docker-format:  ## Format code in fresh Docker container
+	./docker.sh format
+
+docker-clean:  ## Clean up Docker resources
+	./docker.sh clean
+
+docker-jupyter:  ## Start Jupyter notebook in Docker
+	./docker.sh jupyter

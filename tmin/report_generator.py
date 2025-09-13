@@ -110,7 +110,7 @@ class ReportGenerator:
         Status: {status}
 
         #metadata should be formated in a table
-
+g
 
         ANALYSIS FINDINGS:
         ------------------
