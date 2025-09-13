@@ -4,7 +4,7 @@
   <img src="https://github.com/user-attachments/assets/52007543-8109-44ff-845e-c6a809a89a38" alt="TMIN Logo" width="700" />
 </p>
 
-[![Downloads per month](https://pepy.tech/badge/tmin/month)](https://pepy.tech/project/tmin)
+[![Downloads](https://pepy.tech/badge/tmin)](https://pepy.tech/project/tmin)
 [![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
 ![License](https://img.shields.io/pypi/l/tmin)
 [![Tests](https://github.com/AndrewTrepagnier/tmin/workflows/Tests/badge.svg)](https://github.com/AndrewTrepagnier/tmin/actions)
@@ -14,15 +14,15 @@
 [![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://github.com/AndrewTrepagnier/tmin/wiki)
 [![Blog](https://img.shields.io/badge/Important-DesignDoc-pink)](https://your-blog-link.com)
 
-TMIN (an abbreviation for "minimum thickness") is an open source software designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
+TMIN (an abbreviation for "minimum thickness") is an open source python package designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
 
 Many oil and gas companies are faced with maintaining thousands of miles of 100+ year old piping networks supporting multi-million dollar/year processing operations. There is rarely a simple solution to immediately shutdown a process pipe - as these shutdowns more often than not impact other units and cost companies millions in time and resources.
 
-***This is more than a python package, it is a comprehensive engineering decision support system for critical infrastructure safety and operational continuity.***
+***TMIN can be used as a conservative and rapid engineering support tool for assessing piping inspection data and determine how close the pipe is to its end of service life.***
 
 ---
 
-# Getting Started
+# How to install and get started
 
 ### Installation:
 
@@ -34,47 +34,16 @@ pip install tmin
 
 Suppose the following scenario:
 
-   <img width="400" height="250" alt="image" src="https://github.com/user-attachments/assets/1f87dcb1-7d17-4c25-888b-6d9131098ec0"/>
+  <img width="400" height="800" alt="46743011_2274515489447710_6925256605814489088_n" src="https://github.com/user-attachments/assets/f2161758-9138-4232-956b-29e3a1d308ad"/>
 
-RT findings show your 2" Schedule 40 pipe has 0.060" wall thickness. You need to know if it's safe to operate and how much time remains before pipe retirement.
 
-TMIN can will preform calculations, create visuals, and generate a full assessment report - with only three python functions.
+RT Inspection findings show your 3/4" S/160 pipe has 0.092" (or 2.36 mm) wall thickness. When it was first installed in 2012, it had a nominal thickness of 0.219", indicating that it has corroded 0.126" (or 126 Mils) in 13 years.
 
-```python
-from tmin.core import PIPE
-from tmin.visualization import ThicknessVisualizer
+You need to know if the pipe can safely remain in service until TA 2027 when it can be replaced.
 
-# Create pipe instance
-pipe = PIPE(
-    nps=2,
-    schedule=40, 
-    pressure=300.0,
-    pressure_class=150,
-    metallurgy="Intermediate/Low CS",
-    corrosion_rate=12.0,
-    yield_stress=33000.0,  # 33 ksi for ~22 ksi allowable stress
-    design_temp=600.0
-)
+TMIN will preform calculations, create visuals, and generate a full assessment report - with only three python functions.
 
-# Analyze thickness and generate report
-results = pipe.analysis(
-    measured_thickness=0.188,
-    year_inspected=2024,
-    month_inspected=6
-)
-report = pipe.report("TXT")  # Options: "CSV", "JSON", "TXT", "IPYNB"
 
-# Create visualizations
-visualizer = ThicknessVisualizer()
-comparison_chart = visualizer.create_comparison_chart(results, 0.188)
-number_line = visualizer.create_thickness_number_line(pipe, results, 0.188)
-
-print(f"Flag: {results['flag']}")
-print(f"Status: {results['status']}")
-print(f"Report saved: {report['file_path']}")
-print(f"Comparison chart: {comparison_chart}")
-print(f"Number line visualization: {number_line}")
-```
 
 **Results:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
 
