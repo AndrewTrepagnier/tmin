@@ -30,25 +30,39 @@ Many oil and gas companies are faced with maintaining thousands of miles of 100+
 pip install tmin
 ```
 
-### Basic Example:
-
-Suppose the following scenario:
-
-  <img width="400" height="800" alt="46743011_2274515489447710_6925256605814489088_n" src="https://github.com/user-attachments/assets/f2161758-9138-4232-956b-29e3a1d308ad"/>
-
-
-RT Inspection findings show your 3/4" S/160 pipe has 0.092" (or 2.36 mm) wall thickness. When it was first installed in 2012, it had a nominal thickness of 0.219", indicating that it has corroded 0.126" (or 126 Mils) in 13 years.
-
-You need to know if the pipe can safely remain in service until TA 2027 when it can be replaced.
-
-TMIN will preform calculations, create visuals, and generate a full assessment report - with only three python functions.
-
-
-
 **Results:** Professional report with compliance status, remaining life, and visual analysis in under 30 seconds.
 
+<img width="2170" height="1342" alt="20250807_060427_thickness_analysis_number_line" src="https://github.com/user-attachments/assets/a086ba5a-00b6-45ce-999f-dbbc0b592234" />
+
+<img width="2170" height="1342" alt="20250807_060427_thickness_comparison_chart" src="https://github.com/user-attachments/assets/c972ef35-f994-4700-a0ad-3ea905f6e25f" />
+Text File of Full Report:
 
 
+```
+
+TMIN - PIPE THICKNESS ANALYSIS REPORT
+=====================================
+
+Report Generated: 2025-08-07 06:04:27
+Analysis ID: TMIN_20250807_060427
+
+FLAG STATUS: GREEN
+Status: SAFE_TO_CONTINUE
+
+EXECUTIVE SUMMARY
+-----------------
+All criteria satisfied - pipe can safely continue in operation
+
+KEY FINDINGS
+------------
+• Actual Thickness: 0.1740 inches
+• Governing Thickness: 0.0500 inches (structural)
+• Corrosion Allowance: 0.12399999999999999 inches
+• Estimated Remaining Life: 10.333333333333332 years
+.
+.
+.
+```
 
 ## Why TMIN
 
