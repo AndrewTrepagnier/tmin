@@ -374,7 +374,7 @@ class PIPE:
         self._last_analysis_results = result
 
         # TODO: This still requires extensive work
-        return pack_analysis_data = {
+        pack_analysis_data = {
             "measured_thickness": measured_thickness,
             "year_inspected": year_inspected,
             "month_inspected": month_inspected,
@@ -386,6 +386,8 @@ class PIPE:
             "governing_type": governing_type,
             "limits": limits,
             **raised_flag}
+        
+        return pack_analysis_data
 
 
 

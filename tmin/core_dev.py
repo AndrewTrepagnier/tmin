@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from typing import Literal, Optional, Dict, Any
 import matplotlib.pyplot as plt
 from datetime import datetime
+import sympy as sp
+from sympy import symbols, latex, pprint
 
 
 
@@ -19,17 +21,16 @@ class PIPE:
     #########Initialize Characteristics of the Pipe and Service###############
 
     pressure: float  # Design pressure (psi)
-    design_temp: Literal["<900" ,900, 950, 1000, 1050, 1100, 1150, 1200, 1250, "1250+" ] = 900 #Design temp in Fahrenheit
     nps: float # Nominal pipe size in decimal form (e.g. '0.75', '1.5', '2')
     schedule: float  # Pipe schedule (10, 40, 80, 120, 160)
     pressure_class: Literal[150, 300, 600, 900, 1500, 2500]
     metallurgy: Literal["Intermediate/Low CS", "SS 316/316L", "SS 304/304L", "Inconel 625", "Other"]
     yield_stress: float # psi, yield stresses vary from year to year of manufactured piping, ensure the correct year's yield stress is used
-    pipe_config: Literal["straight", "90LR - Inner Elbow", "90LR - Outer Elbow"] = "straight"
-    corrosion_rate: Optional[float] = None #Mils per Year (MPY) 
-    
     
     # Optional fields with defaults
+    design_temp: Literal["<900" ,900, 950, 1000, 1050, 1100, 1150, 1200, 1250, "1250+" ] = 900 #Design temp in Fahrenheit
+    pipe_config: Literal["straight", "90LR - Inner Elbow", "90LR - Outer Elbow"] = "straight"
+    corrosion_rate: Optional[float] = None #Mils per Year (MPY) 
     default_retirement_limit: Optional[float] = None
     API_table : Literal["2025", "2009"] = "2025" # Optional, year 2025 is assumed if left blank
     joint_type: Literal["seamless"] = "seamless" # As of now, TMIN only supports seamless piping analysis, TODO: Add arc butt welded pipe configs
@@ -71,20 +72,21 @@ class PIPE:
         4. final = pipe.pipe_info(flagged, None, result_data)  # Add analysis results
         """
         
-        data_storage = {
-            'pressure': self.pressure,
-            'design_temp': self.design_temp,
-            'nps': self.nps,
-            'schedule': self.schedule,
-            'pressure_class': self.pressure_class,
-            'metallurgy': self.metallurgy,
-            'yield_stress': self.yield_stress,
-            'pipe_config': self.pipe_config,
-            'corrosion_rate': self.corrosion_rate,
-            'default_retirement_limit': self.default_retirement_limit,
-            'API_table': self.API_table,
-            'joint_type': self.joint_type,
-        }
+        if data_storage is None:
+            data_storage = {
+                'pressure': self.pressure,
+                'design_temp': self.design_temp,
+                'nps': self.nps,
+                'schedule': self.schedule,
+                'pressure_class': self.pressure_class,
+                'metallurgy': self.metallurgy,
+                'yield_stress': self.yield_stress,
+                'pipe_config': self.pipe_config,
+                'corrosion_rate': self.corrosion_rate,
+                'default_retirement_limit': self.default_retirement_limit,
+                'API_table': self.API_table,
+                'joint_type': self.joint_type,
+            }
 
 
         # Stage 1: Merge in table_info (dimensions, material properties, etc.)
@@ -178,17 +180,17 @@ class PIPE:
 
 
     @staticmethod
-    def inches_to_mils(self, inches_value: float) -> float: 
+    def inches_to_mils(inches_value: float) -> float: 
         """Convert inches to mils (1 inch = 1000 mils)"""
         return inches_value * 1000
     
     @staticmethod
-    def mils_to_inches(self, mils_value: float) -> float:
+    def mils_to_inches(mils_value: float) -> float:
         """Convert mils to inches (1000 mils = 1 inch)"""
         return mils_value * 0.001
     
     @staticmethod
-    def _calculate_time_elapsed(self, year_inspected: int, month_inspected: Optional[int] = None) -> float:
+    def _calculate_time_elapsed(year_inspected: int, month_inspected: Optional[int] = None) -> float:
         """
         Calculate precise time elapsed since inspection date
         
@@ -220,7 +222,7 @@ class PIPE:
         return time_elapsed
     
     @staticmethod
-    def _format_inspection_date(self, year: int, month: Optional[int] = None) -> str:
+    def _format_inspection_date(year: int, month: Optional[int] = None) -> str:
         """Format inspection date for display"""
         month_str = f"{month:02d}" if month is not None else "01"
         return f"{year}-{month_str}"
@@ -242,7 +244,10 @@ class PIPE:
             'allowable_stress': allowable_stress,
             'joint_type': joint_type,
             'y_coefficient' : y_coefficient,
-            'centerline_radius': centerline_radius
+            'centerline_radius': centerline_radius,
+            'API574_CS_400F': self.API574_CS_400F,
+            'API574_SS_400F': self.API574_SS_400F,
+            'API574_2009_TABLE_6': self.API574_2009_TABLE_6
         }
         return table_info
     
@@ -273,7 +278,7 @@ class PIPE:
     #####################################################################################
 
     
-    def tmin_pressure(self, pipe_data: Dict[str, Any] -> float):
+    def tmin_pressure(self, pipe_data: Dict[str, Any]) -> float:
 
         # passes the enriched data dictionaries through each method instead of using self references. This approach is  for eliminating state dependencies.
 
@@ -384,10 +389,10 @@ class PIPE:
         # Get default retirement limit early for validation
         default_retirement_limit = self.default_retirement_limit
         
-        if default_retirement_limit is not None and default_retirement_limit < self.get_structural_thickness_requirement():
+        if default_retirement_limit is not None and default_retirement_limit < self.tmin_structural(pipe_data):
             raise ValueError(f"Default, company-specific retirement limits shall not be below API {self.API_table} appointed structural thickness requirements")
 
-        if measured_thickness > self.outer_diameter - self.inner_diameter:
+        if measured_thickness > pipe_data['outer_diameter'] - pipe_data['inner_diameter']:
             raise ValueError(f"Measured thickness cannot be greater than nominal pipe wall thickness: units should be in inches")
 
 
@@ -543,7 +548,7 @@ class PIPE:
             Complete dictionary containing all pipe information, analysis results, and flags
         """
         # Stage 1: Get basic pipe metadata
-        metadata = self.pipe_info()
+        metadata = self.pipe_info(None)
         
         # Stage 2: Enrich with table lookups (dimensions, material properties, etc.)
         table_info = self.get_table_info()
@@ -553,9 +558,162 @@ class PIPE:
         analysis_results = self.calculate_all(enriched_data, measured_thickness, year_inspected, month_inspected)
         
         # Stage 4: Final enrichment - combine everything into one complete package
-        final_data = self.pipe_info(enriched_data, analysis_results)
+        final_data = self.pipe_info(enriched_data, None, None, analysis_results)
+        
+        # Stage 5: Generate SymPy mathematical report
+        sympy_report = self.quick_report(final_data)
+        final_data['sympy_report'] = sympy_report
         
         return final_data
+
+
+
+
+    def calculate_corrosion_allowance(self, excess_thickness: float, corrosion_rate: float) -> float:
+        """Calculate remaining life based on excess thickness and corrosion rate"""
+        return self.inches_to_mils(excess_thickness) / corrosion_rate
+
+    
+
+    def quick_report(self, analysis_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate a lightweight SymPy-based report showing equations and calculations.
+        
+        This creates a symbolic representation of the pressure design equation and displays
+        input parameters and computed outputs in a clean, mathematical format.
+        
+        Args:
+            analysis_data: Complete analysis data from analyze() or analyze_generator()
+            
+        Returns:
+            Dict containing SymPy equations, input table, and output table
+        """
+        
+        # Define symbolic variables
+        P, D, S, E, W, Y = symbols('P D S E W Y')
+        
+        # ASME B31.1 Pressure Design Equation (Eq. 3a)
+        # t = (P * D) / (2 * (S * E * W) + (P * Y))
+        pressure_eq = (P * D) / (2 * (S * E * W) + (P * Y))
+        
+        # Substitute actual values
+        pressure_eq_substituted = pressure_eq.subs({
+            P: analysis_data['pressure'],
+            D: analysis_data['outer_diameter'],
+            S: analysis_data['allowable_stress'],
+            E: analysis_data['joint_type']['joint_efficiency'],
+            W: analysis_data['joint_type']['weld_strength_reduction'],
+            Y: analysis_data['y_coefficient']
+        })
+        
+        # Create input parameters table
+        input_table = {
+            'Parameter': ['Design Pressure (P)', 'Outside Diameter (D)', 'Allowable Stress (S)', 
+                         'Joint Efficiency (E)', 'Weld Strength Reduction (W)', 'Y Coefficient (Y)'],
+            'Symbol': ['P', 'D', 'S', 'E', 'W', 'Y'],
+            'Value': [
+                f"{analysis_data['pressure']:.1f} psi",
+                f"{analysis_data['outer_diameter']:.3f} in",
+                f"{analysis_data['allowable_stress']:.0f} psi",
+                f"{analysis_data['joint_type']['joint_efficiency']:.1f}",
+                f"{analysis_data['joint_type']['weld_strength_reduction']:.1f}",
+                f"{analysis_data['y_coefficient']:.3f}"
+            ],
+            'Units': ['psi', 'in', 'psi', '-', '-', '-']
+        }
+        
+        # Create computed outputs table
+        output_table = {
+            'Result': ['Pressure Minimum Thickness', 'Structural Minimum Thickness', 
+                      'Governing Thickness', 'Actual Thickness', 'Corrosion Allowance',
+                      'Flag Status', 'Governing Type'],
+            'Value': [
+                f"{analysis_data['tmin_pressure']:.4f} in",
+                f"{analysis_data['tmin_structural']:.4f} in",
+                f"{analysis_data['governing_thickness']:.4f} in",
+                f"{analysis_data['current_thickness']:.4f} in",
+                f"{analysis_data.get('corrosion_allowance', 'N/A')}",
+                f"{analysis_data['flag']}",
+                f"{analysis_data['governing_type']}"
+            ],
+            'Units': ['in', 'in', 'in', 'in', 'in', '-', '-']
+        }
+        
+        # Create SymPy report
+        sympy_report = {
+            'equation': {
+                'symbolic': pressure_eq,
+                'substituted': pressure_eq_substituted,
+                'latex': latex(pressure_eq),
+                'latex_substituted': latex(pressure_eq_substituted)
+            },
+            'input_parameters': input_table,
+            'computed_outputs': output_table,
+            'pipe_specs': {
+                'NPS': f"{analysis_data['nps']}\"",
+                'Schedule': f"{analysis_data['schedule']}",
+                'Pressure Class': f"{analysis_data['pressure_class']}",
+                'Metallurgy': analysis_data['metallurgy'],
+                'Pipe Config': analysis_data['pipe_config']
+            },
+            'analysis_summary': {
+                'flag': analysis_data['flag'],
+                'status': analysis_data['status'],
+                'message': analysis_data['message'],
+                'governing_factor': analysis_data['governing_type']
+            }
+        }
+        
+        return sympy_report
+
+    def analyze_generator(self, measured_thickness: float, year_inspected: Optional[int] = None, 
+                         month_inspected: Optional[int] = None):
+        """
+        Generator version of analyze() that yields each stage of the analysis pipeline.
+        
+        This method provides the same functionality as analyze() but orchestrates each data enrichment stage iteratively
+        so the results can be seen at each stage if needed for debugging. 
+
+        Stages:
+            - "metadata": Basic pipe properties
+            - "enriched": Pipe properties + table lookups (dimensions, material properties)
+            - "analysis_results": Analysis calculations and flag determination
+            - "final": Complete analysis package with all data
+            - "sympy_report": SymPy mathematical equations and formatted tables
+
+        Example:
+            >>> pipe = PIPE(...)
+            >>> for stage_name, data in pipe.analyze_generator(0.25, 2024):
+            ...     print(f"Stage: {stage_name}")
+            ...     if stage_name == "enriched":
+            ...         print(f"OD: {data['outer_diameter']}")
+            ...     elif stage_name == "final":
+            ...         print(f"Flag: {data['flag']}")
+            ...     elif stage_name == "sympy_report":
+            ...         print(f"Equation: {data['equation']['latex']}")
+        """
+        
+        # Stage 1: Basic metadata
+        metadata = self.pipe_info(None)
+        yield "metadata", metadata
+        
+        # Stage 2: Add table lookups (dimensions, material properties, etc.)
+        table_info = self.get_table_info()
+        enriched_data = self.pipe_info(metadata, table_info)
+        yield "enriched", enriched_data
+        
+        # Stage 3: Run analysis calculations and get results (including flags)
+        analysis_results = self.calculate_all(enriched_data, measured_thickness, year_inspected, month_inspected)
+        yield "analysis_results", analysis_results
+        
+        # Stage 4: Final enrichment - combine everything into one complete package
+        final_data = self.pipe_info(enriched_data, analysis_results)
+        yield "final", final_data
+        
+        # Stage 5: SymPy mathematical report
+        sympy_report = self.quick_report(final_data)
+        yield "sympy_report", sympy_report
+
 
 
 
