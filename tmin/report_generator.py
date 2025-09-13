@@ -1,61 +1,221 @@
 from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from datetime import datetime
 import os
 
+
+@dataclass
 class ReportGenerator:
     """
     Generates text reports for pipe thickness analysis
+
+
+        # print(f"###################################")
+        # print(f"GREEN FLAG")
+        # print(f"###################################")
+
+        # print(f"Criteria Satisfied per API {self.API_table} / ASME Code")
+        # print(f"Piping can safely continue in operation")
+        
+
+        # print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
+        # print(f"Next retirement limit ({retirement_type}): {next_retirement_limit:.4f} inches ({self.inches_to_mils(next_retirement_limit):.1f} mils)")
+        # print(f"Corrosion allowance: {corrosion_allowance:.4f} inches ({self.inches_to_mils(corrosion_allowance):.1f} mils)")
+
+
+
+        print(f"###################################")
+        print(f"YELLOW FLAG")
+        print(f"###################################")
+        
+        print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
+        print(f"Fitness for Service (FFS) assessment recommended")
+        print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
+        print(f"Below structural minimum by: {structural_deficit:.4f} inches ({self.inches_to_mils(structural_deficit):.1f} mils)")
+        print(f"Below company retirement limit by: {default_deficit:.4f} inches ({self.inches_to_mils(default_deficit):.1f} mils)")
+        print(f"Engineering judgment and FFS assessment required for continued operation")
+
+
+
+
+        print(f"###################################")
+        print(f"RED FLAG")
+        print(f"###################################")
+        
+        print(f"CRITICAL: Below pressure minimum thickness requirement")
+        print(f"IMMEDIATE RETIREMENT REQUIRED")
+
+        print(f"Current thickness: {actual_thickness:.4f} inches ({self.inches_to_mils(actual_thickness):.1f} mils)")
+        print(f"Pressure minimum required: {tmin_pressure:.4f} inches ({self.inches_to_mils(tmin_pressure):.1f} mils)")
+        print(f"Deficit: {pressure_deficit:.4f} inches ({self.inches_to_mils(pressure_deficit):.1f} mils)")
+        print(f"Rigorous analysis required for any continued operations")
+        print(f"Consider temporary leak detection devices if operation must continue")
+
     """
+
+    reports_folder : str # this is the specified folder name you want to create
+    data_analysis : Dict
+
+
+    def filehandler(self, reports_filepath : Optional[str] = None):
+        """
+        Example reports_filepath = "/Users/andrewtrepagnier/projects/my_project/"
+
+        This is optional. Leaving it blank will automatically populate
+        the reports in the current project root directory.
+        """
+
+        if reports_filepath is None:
+
+            # Get the folder of this script as the project root
+
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+
+            self.reports_folder = os.path.join(current_dir, "reports")
+
+        else:
+            # Use the user-specified path
+
+            self.reports_folder = os.path.join(reports_filepath, "reports")
+
+        # Create the directory if it doesn’t exist
+
+        os.makedirs(self.reports_folder, exist_ok=True)
+
+        return self.reports_folder
+
+
+
+
+    def quick_report(self) -> str:
+
+        # filehandler method must be ran prior to this
+        # This is a standard template that works for any flag and will provide users with a brief output in additon to the full reports 
+
+        retrieve_str = """
+
+        
+        Report Generation Sucessful!
+
+        Comprehensive Reports and Visualizations are available in {self.filehandler}
+
+        ****************************************************************************
+                                        Quick Summary
+        ****************************************************************************
+
+        Report Generated: {timestamp}
+        Analysis ID: {analysis_id}
+
+        FLAG STATUS: {flag_status}
+        Status: {status}
+
+        #metadata should be formated in a table
+
+
+        ANALYSIS FINDINGS:
+        ------------------
+        • Actual (Current-day) Thickness: {actual_thickness:.4f} inches
+        • Governing Thickness: {governing_thickness:.4f} inches ({governing_type})
+        • Corrosion Allowance: {corrosion_allowance} inches
+        • Estimated Remaining Life: {remaining_life} years
+
+        THICKNESS REQUIREMENTS
+        ----------------------
+        Pressure Minimum: {tmin_pressure:.4f} inches
+        Structural Minimum: {tmin_structural:.4f} inches
+        API 574 RL: {api574_RL:.4f} inches
+
+
+        FLAG RECOMMENDATIONS
+        --------------------
+        {self.flag_recommendations}
+
+        DISCLAIMER
+        --------------------
+
+        TMIN is a decision support tool that should be paired with proffesional engineering judgement. Users should refer to the design document to understand the 
+        limitations and assumptions made in the analysis and implementation of the industry codes before considering the analysis' results. TMIN's authors are not liable for 
+        the misuse of the software.
+
+
+        ===========================================================================
+        """ 
+        return retrieve_str
+
+
+        def flag_recommendations(self) -> str:
+
+            if self.flag_status == 'GREEN':
+
+                print(f"Criteria Satisfied per API {self.API_table} / ASME Code")
+                print(f"Piping can safely continue in operation")
+                print(f"The next retirement limit is governed by {retirement_type} at {next_retirement_limit} inches (or {self.inches_to_mils(self.next_retirement_limit)} MPY)")
+
+
+            elif self.flag_status == 'YELLOW':
+
+                
+
+                print(f"Not all code criteria satisfied per API {self.API_table} / ASME Code")
+                print(f"Fitness for Service (FFS) assessment may be needed for higher confidence")
+
+
+            else: #self.flag_status == 'RED':
+
+                print(f"CRITICAL: Below pressure minimum thickness requirement")
+                print(f"Immediate Retirement is recommended. Risk-based assessment and FFS is needed for continued operation.")
+
+
     
-    def __init__(self):
-        # Get the root directory of the package (where pyproject.toml is located)
-        # This ensures reports are always generated in the package root
-        current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/
-        package_root = os.path.dirname(current_dir)  # Go up one level to package root
-        self.reports_dir = os.path.join(package_root, "Reports")
-        os.makedirs(self.reports_dir, exist_ok=True)
-        self.report_template = """
-TMIN - PIPE THICKNESS ANALYSIS REPORT
-=====================================
+#     def __init__(self):
+#         # Get the root directory of the package (where pyproject.toml is located)
+#         # This ensures reports are always generated in the package root
+#         current_dir = os.path.dirname(os.path.abspath(__file__))  # tmin/
+#         package_root = os.path.dirname(current_dir)  # Go up one level to package root
+#         self.reports_dir = os.path.join(package_root, "Reports")
+#         os.makedirs(self.reports_dir, exist_ok=True)
+#         self.report_template = """
+# TMIN - PIPE THICKNESS ANALYSIS REPORT
+# =====================================
 
-Report Generated: {timestamp}
-Analysis ID: {analysis_id}
+# Report Generated: {timestamp}
+# Analysis ID: {analysis_id}
 
-FLAG STATUS: {flag_status}
-Status: {status}
+# FLAG STATUS: {flag_status}
+# Status: {status}
 
-EXECUTIVE SUMMARY
------------------
-{message}
+# EXECUTIVE SUMMARY
+# -----------------
+# {message}
 
-KEY FINDINGS
-------------
-• Actual Thickness: {actual_thickness:.4f} inches
-• Governing Thickness: {governing_thickness:.4f} inches ({governing_type})
-• Corrosion Allowance: {corrosion_allowance} inches
-• Estimated Remaining Life: {remaining_life} years
+# KEY FINDINGS
+# ------------
+# • Actual Thickness: {actual_thickness:.4f} inches
+# • Governing Thickness: {governing_thickness:.4f} inches ({governing_type})
+# • Corrosion Allowance: {corrosion_allowance} inches
+# • Estimated Remaining Life: {remaining_life} years
 
-PIPE SPECIFICATIONS
--------------------
-NPS: {nps}" Schedule {schedule}, Class {pressure_class}
-Metallurgy: {metallurgy}
-Design Pressure: {pressure} psi
-Corrosion Rate: {corrosion_rate} mpy
+# PIPE SPECIFICATIONS
+# -------------------
+# NPS: {nps}" Schedule {schedule}, Class {pressure_class}
+# Metallurgy: {metallurgy}
+# Design Pressure: {pressure} psi
+# Corrosion Rate: {corrosion_rate} mpy
 
-THICKNESS REQUIREMENTS
-----------------------
-Pressure Minimum: {tmin_pressure:.4f} inches
-Structural Minimum: {tmin_structural:.4f} inches
-API 574 RL: {api574_RL:.4f} inches
+# THICKNESS REQUIREMENTS
+# ----------------------
+# Pressure Minimum: {tmin_pressure:.4f} inches
+# Structural Minimum: {tmin_structural:.4f} inches
+# API 574 RL: {api574_RL:.4f} inches
 
-RECOMMENDATIONS
----------------
-{recommendations}
+# RECOMMENDATIONS
+# ---------------
+# {recommendations}
 
-NOTES
------
-{notes}
-"""
+# NOTES
+# -----
+# {notes}
+# """
     
     def _get_filename_with_date(self, base_name: str, filename: Optional[str] = None) -> str:
         """Generate filename with date prefix"""

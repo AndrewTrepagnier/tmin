@@ -28,6 +28,7 @@ requires-python = ">=3.8"
 dependencies = [
     "numpy>=1.23",
     "matplotlib>=3.5",
+    "sympy>=1.11",
     "toml>=0.10.0",
     "jupyter>=1.0.0",
     "notebook>=6.0.0",
@@ -37,6 +38,10 @@ dependencies = [
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
+    "pytest-xdist>=3.0",
+    "black>=22.0",
+    "flake8>=5.0",
+    "mypy>=1.0",
 ]
 
 [project.scripts]
@@ -52,3 +57,38 @@ include = ["tmin*"]
 
 [tool.setuptools.package-data]
 tmin = ["asmetables/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=tmin",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["tmin"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
