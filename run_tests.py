@@ -1,40 +1,40 @@
 #!/usr/bin/env python3
 """
-Simple test runner for TMIN package
+Simple test runner for the TMIN package.
+Runs pytest with coverage and produces both terminal and HTML reports.
 """
+
 import subprocess
 import sys
-import os
+from pathlib import Path
 
-def run_tests():
-    """Run the test suite"""
-    print("🧪 Running TMIN Test Suite")
-    print("=" * 50)
-    
-    # Change to project root
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    
+
+def run_tests() -> bool:
+    root = Path(__file__).resolve().parent
+    print("\nRunning tests for TMIN...\n" + "-" * 50)
+
+    cmd = [
+        sys.executable, "-m", "pytest",
+        "tests/",
+        "--cov=tmin",
+        "--cov-report=term-missing",
+        "--cov-report=html",
+        "-v"
+    ]
+
     try:
-        # Run pytest with coverage
-        result = subprocess.run([
-            sys.executable, "-m", "pytest", 
-            "tests/", 
-            "--cov=tmin", 
-            "--cov-report=term-missing",
-            "--cov-report=html",
-            "-v"
-        ], check=True)
-        
-        print("\n✅ All tests passed!")
-        print("📊 Coverage report generated in htmlcov/index.html")
-        return True
-        
-    except subprocess.CalledProcessError as e:
-        print(f"\n❌ Tests failed with exit code {e.returncode}")
-        return False
+        subprocess.run(cmd, check=True, cwd=root)
     except FileNotFoundError:
-        print("❌ pytest not found. Install with: pip install pytest pytest-cov")
+        print("pytest is not installed. Try:\n    pip install pytest pytest-cov")
         return False
+    except subprocess.CalledProcessError as e:
+        print(f"Some tests failed (exit code {e.returncode}).")
+        return False
+
+    print("\nAll tests passed.")
+    print("Coverage report written to: htmlcov/index.html")
+    return True
+
 
 if __name__ == "__main__":
     success = run_tests()
