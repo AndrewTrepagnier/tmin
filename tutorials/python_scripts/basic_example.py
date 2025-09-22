@@ -9,6 +9,7 @@ Minimal example showing core TMIN functionality.
 from tmin.core import PIPE
 
 # Create a pipe instance
+
 pipe = PIPE(
     nps=2.0,
     schedule=40,
@@ -29,6 +30,9 @@ results = pipe.analysis(
     month_inspected=6,
     joint_type='Seamless'
 )
+
+
+
 
 # Print basic results
 print(f"Flag: {results['flag']}")
