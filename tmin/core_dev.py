@@ -714,7 +714,85 @@ class PIPE:
         sympy_report = self.quick_report(final_data)
         yield "sympy_report", sympy_report
 
-
-
-
+    def report(self, report_format: str = "TXT", filename: Optional[str] = None, **analysis_kwargs) -> Dict[str, Any]:
+        """
+        Generate analysis report in specified format
         
+        Args:
+            report_format: Format of the report ("CSV", "JSON", "TXT", "IPYNB")
+            filename: Optional filename (without extension) for the report
+            **analysis_kwargs: Arguments to pass to analyze() method if not already called
+            
+        Returns:
+            Dict containing report data and file paths
+        """
+        from .report_generator import ReportGenerator
+        
+        # Check if analysis has already been performed (stored in instance)
+        if not hasattr(self, '_last_analysis_results'):
+            # Perform analysis with provided kwargs
+            if not analysis_kwargs:
+                raise ValueError("Analysis arguments required. Provide measured_thickness and other parameters.")
+            
+            self._last_analysis_results = self.analyze(**analysis_kwargs)
+        
+        analysis_results = self._last_analysis_results
+        actual_thickness = analysis_results['current_thickness']
+        
+        # Initialize report generator
+        report_gen = ReportGenerator()
+        
+        # Generate report based on format
+        if report_format.upper() == "CSV":
+            report_path = report_gen.generate_csv_report(self, analysis_results, filename)
+            return {
+                "format": "CSV",
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "JSON":
+            report_path = report_gen.generate_json_report(self, analysis_results, filename)
+            return {
+                "format": "JSON", 
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "TXT":
+            # Generate full text report
+            report_path = report_gen.generate_report(self, analysis_results, actual_thickness, filename)
+            return {
+                "format": "TXT",
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        elif report_format.upper() == "IPYNB":
+            report_path = report_gen.generate_notebook_report(self, analysis_results, filename)
+            return {
+                "format": "IPYNB",
+                "file_path": report_path,
+                "analysis_results": analysis_results
+            }
+            
+        else:
+            raise ValueError(f"Unsupported report format: {report_format}. Supported formats: CSV, JSON, TXT, IPYNB")
+    
+    def get_last_analysis(self) -> Optional[Dict[str, Any]]:
+        
+        return getattr(self, '_last_analysis_results', None)
+    
+    def generate_report(self, measured_thickness: float, year_inspected: Optional[int] = None, 
+                       month_inspected: Optional[int] = None, filename: Optional[str] = None) -> str:
+        
+        from .report_generator import ReportGenerator
+        
+        # Perform analysis
+        analysis_results = self.analyze(measured_thickness, year_inspected, month_inspected)
+        
+        # Generate report
+        report_gen = ReportGenerator()
+        report_path = report_gen.generate_report_from_core_dev(self, analysis_results, filename)
+        
+        return report_path
