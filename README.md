@@ -5,14 +5,7 @@
 </p>
 
 [![Downloads](https://pepy.tech/badge/tmin)](https://pepy.tech/project/tmin)
-[![PyPI version](https://badge.fury.io/py/tmin.svg)](https://badge.fury.io/py/tmin)
-![License](https://img.shields.io/pypi/l/tmin)
-[![Tests](https://github.com/AndrewTrepagnier/tmin/workflows/Tests/badge.svg)](https://github.com/AndrewTrepagnier/tmin/actions)
-[![codecov](https://codecov.io/gh/AndrewTrepagnier/tmin/branch/main/graph/badge.svg)](https://codecov.io/gh/AndrewTrepagnier/tmin)
-[![Python Versions](https://img.shields.io/pypi/pyversions/tmin.svg)](https://pypi.org/project/tmin/)
-[![Blog](https://img.shields.io/badge/Updates-blog-purple)](https://your-blog-link.com)
-[![Blog](https://img.shields.io/badge/dev-wiki-gold)](https://github.com/AndrewTrepagnier/tmin/wiki)
-[![Blog](https://img.shields.io/badge/Important-DesignDoc-pink)](https://your-blog-link.com)
+
 
 TMIN (an abbreviation for "minimum thickness") is an open source python package designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
 
