@@ -50,6 +50,7 @@ templates/
 engineering_memorandum.txt
 
 # TMIN specific
+.tools/
 Reports/
 output/
 *.log
