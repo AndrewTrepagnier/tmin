@@ -13,53 +13,35 @@ Many oil and gas companies are faced with maintaining thousands of miles of 100+
 
 ***TMIN can be used as a conservative and rapid engineering support tool for assessing piping inspection data and determine how close the pipe is to its end of service life.***
 
----
+### First Time Users
 
-# How to install and get started
+First time users should use the ```tmin_workflow.ipynb``` example in tutorials.
 
-### Installation:
+### Repository layout
 
-```bash
-pip install tmin
+```
+tmin/
+├── tmin/              # Package (PIPE, analyze, report)
+├── examples/          # Example JSON input for memorandum workflow
+├── templates/         # Engineering memorandum template
+├── tutorials/         # Notebooks and scripts
+├── references/        # API 574 reference PDFs
+├── pyproject.toml
+├── README.md
+└── LICENSE
 ```
 
-### Basic Usage
+### Memorandum workflow
+
+From the repo root (with example data in `examples/`):
+
 ```python
-from tmin import PIPE
-
-# Create pipe instance
-pipe = PIPE(
-    pressure=50,           # Design pressure (psi)
-    nps=2,                 # Nominal pipe size (inches)
-    schedule=40,           # Pipe schedule
-    pressure_class=150,    # Pressure class
-    metallurgy="Intermediate/Low CS",
-    yield_stress=23333     # Yield stress (psi)
-)
-
-# Analyze measured thickness
-results = pipe.analyze(
-    measured_thickness=0.060,  # Measured thickness (inches)
-    year_inspected=2023        # Optional: inspection year
-)
-
-print(f"Flag: {results['flag']}")
-print(f"Status: {results['status']}")
-print(f"Governing thickness: {results['governing_thickness']:.4f} inches")
+import tmin
+tmin.analyze()   # Terminal report
+tmin.report()    # Writes to output/
 ```
 
-## Docker Usage
 
-Run TMIN in a container:
-
-```bash
-# Build and run
-./docker.sh build
-./docker.sh run
-
-# Or test functionality
-./docker.sh test
-```
 
 ## License
 

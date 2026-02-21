@@ -46,8 +46,12 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+templates/
+engineering_memorandum.txt
+
 # TMIN specific
 Reports/
+output/
 *.log
 
 # Jupyter Notebook
