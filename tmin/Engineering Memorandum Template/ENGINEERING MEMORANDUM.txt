@@ -1,0 +1,73 @@
+ENGINEERING MEMORANDUM
+
+
+[Site Name] - [Fixed Equipment Department] - Fixed Equipment - [Unit]
+
+Repair Plan: [Company] [Pipe Circuit no.] [Size] [Circuit Fluid Service] [Type of Equipment(pipe, vessel, nozzle, tank)] [subcomponent]
+
+Unit: [Unit]
+
+From: [Author Name] ([Author Phone Number])
+
+
+Date: [Date of generation]
+
+
+
+Background:
+
+ - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment(pipe, vessel, nozzle, tank)] found a low remaining wall thickness ([TML number] at [Current thickness to date]") located near on [size] [subcomponent] due to [Internal/External] [EDD] corrosion. 
+
+ - Per Credo, the POF is currently a [current POF] and will progress to a [POF at outage timestamp] through [Unit] [Incoming Outage timestamp] outage opportunity. 
+
+ - [Pipe Circuit No.][Type of component] has a SHE-[SHE consequence level] of a [failure types(pinhole, rupture, corrosion hole)] leading to a potential [Consequence type(Fire scenario, toxic release, burn scenario)]. 
+
+ -AR/T = 1 in [Date AR/T = 1 (formatted as DD-MMM-YYYY)].
+
+
+
+
+Component: [Size] [Circuit Fluid Service] [Type of Equipment(pipe, vessel, nozzle, tank)] [subcomponent]
+
+Design Pressure / Design Temperature: [Design Pressure] PSIG / [Design Temperature] F
+
+Nominal Thickness: [Nominal Thickness]"
+
+Lowest Thickness recorded to date: [current thickness]"
+
+Current Tmin on record: [Current tmin]"
+
+
+
+
+Engineering Recommendation:
+
+Engineering recommendation is to replace the [subcomponent] of the [size][Type of equipment] either prior or during the [Unit] [Incoming Outage timestamp] outage opportunity.
+
+Engineering recommendation is to apply engineered wrap to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+
+Engineering recommendation is to apply engineered clamp to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+
+
+Engineering recommendation is to apply full encirclement welded sleeve to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+
+Engineering recommendation is to apply welded enclosure to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+
+
+ESL Evaluation:
+
+EDD: [EDD]
+
+Corrosion Rate: [CR] mpy ([CR description])
+
+ESL Evaluation: [ESL Evaluation]
+
+Notes: [AR/T Basis]
+
+
+
+
+
+
+
+
