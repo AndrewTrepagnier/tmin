@@ -12,7 +12,14 @@ report() to generate the memorandum text file.
 """
 
 from .core_exp import PIPE
-from .report import analyze, report, run, run_report_from_input, get_default_template_path
+from .report import (
+    analyze,
+    report,
+    run,
+    run_report_from_input,
+    get_default_template_path,
+    get_package_example_path,
+)
 
 __all__ = [
     "analyze",
@@ -21,4 +28,5 @@ __all__ = [
     "PIPE",
     "run_report_from_input",
     "get_default_template_path",
+    "get_package_example_path",
 ]

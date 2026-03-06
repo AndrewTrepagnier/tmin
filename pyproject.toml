@@ -37,3 +37,9 @@ Issues = "https://github.com/AndrewTrepagnier/tmin/issues"
 
 [tool.setuptools.packages.find]
 include = ["tmin*"]
+
+[tool.setuptools.package-data]
+tmin = ["templates/*", "data/*"]
+
+[project.scripts]
+tmin = "tmin.report:main"

@@ -48,6 +48,9 @@ Thumbs.db
 
 templates/
 engineering_memorandum.txt
+# Package-bundled data (tracked so pip install works)
+!tmin/templates/
+!tmin/data/
 
 # TMIN specific
 .tools/

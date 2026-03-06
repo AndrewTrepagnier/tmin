@@ -12,9 +12,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-# Default template in project templates/ folder
-_DEFAULT_TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
-_DEFAULT_TEMPLATE_PATH = _DEFAULT_TEMPLATE_DIR / "engineering_memorandum.txt"
+# Paths relative to this package (work when installed via pip on any OS)
+_PACKAGE_DIR = Path(__file__).resolve().parent
+_DEFAULT_TEMPLATE_PATH = _PACKAGE_DIR / "templates" / "engineering_memorandum.txt"
+_PACKAGE_EXAMPLE_JSON = _PACKAGE_DIR / "data" / "memorandum_values_example.json"
 
 
 def get_default_template_path() -> Path:
@@ -306,16 +307,28 @@ def _find_project_root(input_dirname: str = "Input", start: Optional[Path] = Non
     return Path.cwd()
 
 
-def _get_input_json_path(root: Path, input_dirname: str = "examples") -> Path:
-    """Return path to first .json in the input directory. Raises FileNotFoundError if none."""
+def get_package_example_path() -> Path:
+    """Return path to the bundled example JSON (works after pip install)."""
+    return _PACKAGE_EXAMPLE_JSON
+
+
+def _get_input_json_path(
+    root: Path,
+    input_dirname: str = "examples",
+    fallback_to_package: bool = True,
+) -> Path:
+    """Return path to first .json in the input directory. If none and fallback_to_package, use bundled example."""
     input_dir = root / input_dirname
+    if input_dir.exists():
+        jsons = sorted(input_dir.glob("*.json"))
+        if jsons:
+            return jsons[0]
+    if fallback_to_package and _PACKAGE_EXAMPLE_JSON.exists():
+        return _PACKAGE_EXAMPLE_JSON
     input_dir.mkdir(parents=True, exist_ok=True)
-    jsons = sorted(input_dir.glob("*.json"))
-    if not jsons:
-        raise FileNotFoundError(
-            f"No .json files in {input_dir}. Put memorandum_values_example.json there and run again."
-        )
-    return jsons[0]
+    raise FileNotFoundError(
+        f"No .json files in {input_dir}. Put a JSON file there or use the bundled example."
+    )
 
 
 def analyze(
@@ -463,3 +476,35 @@ def report(
 def run(root: Optional[Path] = None, verbose: bool = True) -> Dict[str, Any]:
     """Alias for tmin.report(). Writes the memorandum to the output directory."""
     return report(root=root, verbose=verbose)
+
+
+def main() -> None:
+    """CLI entry point: run analyze and/or report. Works from any directory after pip install."""
+    import argparse
+    parser = argparse.ArgumentParser(
+        description="TMIN: pipe thickness analysis and engineering memorandum report."
+    )
+    parser.add_argument(
+        "--analyze-only",
+        action="store_true",
+        help="Only print terminal thickness report (no memorandum file)",
+    )
+    parser.add_argument(
+        "--report-only",
+        action="store_true",
+        help="Only write memorandum to output/ (skip terminal report)",
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="Project root (folder containing examples/). Default: auto-detect or use bundled example.",
+    )
+    args = parser.parse_args()
+    if args.report_only:
+        report(root=args.root)
+    elif args.analyze_only:
+        analyze(root=args.root)
+    else:
+        analyze(root=args.root)
+        report(root=args.root)
