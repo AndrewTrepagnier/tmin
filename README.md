@@ -1,17 +1,17 @@
 # TMIN - Pipe Thickness Analysis Tool
 
 <p align="left">
-  <img src="https://github.com/user-attachments/assets/52007543-8109-44ff-845e-c6a809a89a38" alt="TMIN Logo" width="700" />
+<img width="800" height="600" alt="newtmin" src="https://github.com/user-attachments/assets/fb260356-a59e-4608-b242-954d71847430" />
 </p>
 
 [![Downloads](https://pepy.tech/badge/tmin)](https://pepy.tech/project/tmin)
 
 
-TMIN (an abbreviation for "minimum thickness") is an open source python package designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** — in seconds.
+TMIN (an abbreviation for "minimum thickness") is an open source python package designed to help engineers determine if corroded process piping in refineries and pertrochemical plants are **safe** and **API-compliant** in seconds.
 
 Many oil and gas companies are faced with maintaining thousands of miles of 100+ year old piping networks supporting multi-million dollar/year processing operations. There is rarely a simple solution to immediately shutdown a process pipe - as these shutdowns more often than not impact other units and cost companies millions in time and resources.
 
-***TMIN can be used as a conservative and rapid engineering support tool for assessing piping inspection data and determine how close the pipe is to its end of service life.***
+TMIN can be used as a conservative and rapid engineering support tool for assessing piping inspection data and determine how close the pipe is to its end of service life.
 
 ---
 
