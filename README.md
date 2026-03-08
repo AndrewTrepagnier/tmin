@@ -17,6 +17,23 @@ TMIN can be used as a conservative and rapid engineering support tool for assess
 
 ### Install & run (Mac or Windows)
 
+**Don’t have Python or pip? (e.g. on a fresh PC)**
+
+1. **Install Python** (pip is included):
+   - **Windows:** Download the installer from [python.org/downloads](https://www.python.org/downloads/) and run it. **Check the box “Add Python to PATH”** at the bottom, then finish the install.
+   - **Mac:** Install from [python.org](https://www.python.org/downloads/) or run `brew install python3` if you use Homebrew.
+2. **Open a new terminal** (Command Prompt or PowerShell on Windows).
+3. Confirm Python and pip work:
+   ```bash
+   python --version
+   pip --version
+   ```
+   On some setups you may need `py -3` or `python3` instead of `python`. If `pip` isn’t found, run: `python -m ensurepip --upgrade`.
+
+Then use one of the options below.
+
+---
+
 **Option A – From GitHub (clone then install)**
 
 ```bash
@@ -56,6 +73,10 @@ tmin
 ```
 
 If `tmin` is not on your PATH, run: `python -m tmin.report`
+
+**Windows:** If `python` or `pip` aren’t recognized, try the launcher: `py -3 -m pip install .` then `py -3 -m tmin.report`.
+
+**Verify on a fresh PC:** After `pip install .`, run `tmin` (or `python -m tmin.report`). You should see a short analysis in the terminal and a new `output/engineering_memorandum.txt` file. To run a full “fresh environment” test: `python scripts/test_fresh_install.py`.
 
 ---
 

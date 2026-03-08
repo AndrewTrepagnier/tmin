@@ -193,3 +193,6 @@ docs/build/
 # Development tools
 .pre-commit-config.yaml
 .pre-commit-hooks.yaml 
+
+scripts/test_fresh_install.py
+scripts/test_fresh_install.sh

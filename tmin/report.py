@@ -508,3 +508,7 @@ def main() -> None:
     else:
         analyze(root=args.root)
         report(root=args.root)
+
+
+if __name__ == "__main__":
+    main()
