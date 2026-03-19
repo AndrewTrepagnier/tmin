@@ -1,32 +1,26 @@
 """
-tmin: pipe minimum thickness analysis and engineering memorandum reports.
+tmin — pipe minimum thickness analysis.
 
-Two main entry points::
+Quick start::
 
     import tmin
-    tmin.analyze()   # Terminal report: pressure & structural thicknesses
-    tmin.report()    # Write full engineering memorandum to output/
 
-Both read from examples/ (first .json). Use analyze() for a quick check, then
-report() to generate the memorandum text file.
+    input_dict = {
+        "pressure": 285,
+        "nps": 8,
+        "schedule": 40,
+        "pressure_class": 150,
+        "metallurgy": "Intermediate/Low CS",
+        "yield_stress": 35000,
+        "current_thickness": 0.112,
+    }
+
+    instance = tmin.TMIN(input_dict)
+    result   = instance.calculate()
+    print(instance.report())
 """
 
+from .tmin_class import TMIN
 from .core_exp import PIPE
-from .report import (
-    analyze,
-    report,
-    run,
-    run_report_from_input,
-    get_default_template_path,
-    get_package_example_path,
-)
 
-__all__ = [
-    "analyze",
-    "report",
-    "run",
-    "PIPE",
-    "run_report_from_input",
-    "get_default_template_path",
-    "get_package_example_path",
-]
+__all__ = ["TMIN", "PIPE"]

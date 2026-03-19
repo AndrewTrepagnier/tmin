@@ -3,7 +3,7 @@ ENGINEERING MEMORANDUM
 
 [Site Name] - [Fixed Equipment Department] - Fixed Equipment - [Unit]
 
-Repair Plan: [Company] [Pipe Circuit no.] [Size] [Circuit Fluid Service] [Type of Equipment(pipe, vessel, nozzle, tank)] [subcomponent]
+Repair Plan: [Company] [Pipe Circuit No.] [Size] [Circuit Fluid Service] [Type of Equipment] [subcomponent]
 
 Unit: [Unit]
 
@@ -16,18 +16,16 @@ Date: [Date of generation]
 
 Background:
 
- - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment(pipe, vessel, nozzle, tank)] found a low remaining wall thickness ([TML number] at [Current thickness to date]") located near on [size] [subcomponent] due to [Internal/External] [EDD] corrosion. 
+ - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment] found a low remaining wall thickness ([TML number] at [Current thickness to date]) located near on [Size] [subcomponent] due to [Internal/External] [Degradation Mechanism] corrosion. 
 
- - Per Credo, the POF is currently a [current POF] and will progress to a [POF at outage timestamp] through [Unit] [Incoming Outage timestamp] outage opportunity. 
+ - [Pipe Circuit No.] [Type of Equipment] has a SHE-[SHE consequence level] of a [failure types] leading to a potential [Consequence type]. 
 
- - [Pipe Circuit No.][Type of component] has a SHE-[SHE consequence level] of a [failure types(pinhole, rupture, corrosion hole)] leading to a potential [Consequence type(Fire scenario, toxic release, burn scenario)]. 
-
- -AR/T = 1 in [Date AR/T = 1 (formatted as DD-MMM-YYYY)].
+ - AR/T = 1 in [Date AR/T = 1].
 
 
 
 
-Component: [Size] [Circuit Fluid Service] [Type of Equipment(pipe, vessel, nozzle, tank)] [subcomponent]
+Component: [Size] [Circuit Fluid Service] [Type of Equipment] [subcomponent]
 
 Design Pressure / Design Temperature: [Design Pressure] PSIG / [Design Temperature] F
 
@@ -39,31 +37,57 @@ Current Tmin on record: [Current tmin]"
 
 
 
+Pressure tmin calculations:
+
+  ASME B31.3 Eq. 3a: tmin = (P*D) / (2*(S*E*W + P*Y))
+
+  Inputs:
+    P (design pressure)        = [calc_P] psi
+    D (outer diameter)         = [calc_D] in
+    S (allowable stress)       = [calc_S] psi
+    E (joint efficiency)       = [calc_E]
+    W (weld strength reduction)= [calc_W]
+    Y (y-coefficient)          = [calc_Y]
+
+  Pressure tmin              = [tmin_pressure] in
+  Structural tmin ([struct_label]) = [tmin_structural] in
+  Governing tmin             = [governing_thickness] in ([governing_type])
+  Current thickness          = [current thickness]"
+  Corrosion allowance        = [corrosion_allowance] in
+
+
 
 Engineering Recommendation:
 
-Engineering recommendation is to replace the [subcomponent] of the [size][Type of equipment] either prior or during the [Unit] [Incoming Outage timestamp] outage opportunity.
+Engineering recommendation is to replace the [subcomponent] of the [Size] [Type of Equipment].
 
-Engineering recommendation is to apply engineered wrap to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+Engineering recommendation is to apply engineered wrap to the [subcomponent] of the [Size] [Type of Equipment].
 
-Engineering recommendation is to apply engineered clamp to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+Engineering recommendation is to apply engineered clamp to the [subcomponent] of the [Size] [Type of Equipment].
 
+Engineering recommendation is to apply full encirclement welded sleeve to the [subcomponent] of the [Size] [Type of Equipment].
 
-Engineering recommendation is to apply full encirclement welded sleeve to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
-
-Engineering recommendation is to apply welded enclosure to the [subcomponent] of the [size][Type of equipment] to extend equipment service life to [Unit] [Incoming Outage timestamp] for proper replacement/repair. 
+Engineering recommendation is to apply welded enclosure to the [subcomponent] of the [Size] [Type of Equipment].
 
 
 ESL Evaluation:
 
-EDD: [EDD]
+EDD: [Degradation Mechanism]
 
 Corrosion Rate: [CR] mpy ([CR description])
 
-ESL Evaluation: [ESL Evaluation]
-
-Notes: [AR/T Basis]
+Current Tmin: [Current tmin]"
 
 
+General Notes:
+
+  Allowable Stress Basis: [Allowable Stress Basis]
+  AR/T Basis: [AR/T Basis]
+  AR/T = 1 in [Date AR/T = 1]
+  Structural tmin ([struct_label]): [tmin_structural] in
+  Pressure tmin (ASME B31.3): [tmin_pressure] in
+  Current thickness reading: [current thickness]"
+
+[General Notes]
 
 
