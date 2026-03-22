@@ -10,7 +10,7 @@ from .tables.y_coeff import (
     nickel_alloy_N06690_y, nickel_alloys_N06617_N08800_N08810_N08825_y,
     cast_iron_y,
 )
-from .tables.api_574_2025 import API574_CS_400F, API574_SS_400F
+from .tables.api_574_2024 import API574_NPS_STRUCTURAL_MIN
 from .tables.api_574_2009 import API574_2009_TABLE_6
 from .tables.ANSI_radii import ANSI_radii
 
@@ -40,7 +40,7 @@ class PIPE:
     pipe_config: Literal["straight", "90LR - Inner Elbow", "90LR - Outer Elbow"] = "straight"
     corrosion_rate: Optional[float] = None
     default_retirement_limit: Optional[float] = None
-    API_table: Literal["2025", "2009"] = "2025"
+    API_table: Literal["2024", "2025", "2009"] = "2024"
     joint_type: Literal["seamless"] = "seamless"
 
     trueOD = trueOD
@@ -51,8 +51,7 @@ class PIPE:
     nickel_alloy_N06690_y = nickel_alloy_N06690_y
     nickel_alloys_N06617_N08800_N08810_N08825_y = nickel_alloys_N06617_N08800_N08810_N08825_y
     cast_iron_y = cast_iron_y
-    API574_CS_400F = API574_CS_400F
-    API574_SS_400F = API574_SS_400F
+    API574_NPS_STRUCTURAL_MIN = API574_NPS_STRUCTURAL_MIN
     API574_2009_TABLE_6 = API574_2009_TABLE_6
     ANSI_radii = ANSI_radii
 
@@ -96,8 +95,7 @@ class PIPE:
             'joint_type': self.get_joint_type(),
             'y_coefficient': self.get_y_coefficient(),
             'centerline_radius': self.get_centerline_radius(),
-            'API574_CS_400F': self.API574_CS_400F,
-            'API574_SS_400F': self.API574_SS_400F,
+            'API574_NPS_STRUCTURAL_MIN': self.API574_NPS_STRUCTURAL_MIN,
             'API574_2009_TABLE_6': self.API574_2009_TABLE_6,
         }
 
@@ -139,25 +137,22 @@ class PIPE:
         not cover the given metallurgy / table edition combination.
         """
         nps = pipe_data['nps']
-        pressure_class = pipe_data['pressure_class']
         metallurgy = pipe_data['metallurgy']
-        API_table = pipe_data.get('API_table', '2025')
+        API_table = pipe_data.get('API_table', '2024')
 
-        if API_table == "2025":
-            if metallurgy == "Intermediate/Low CS":
-                table = pipe_data.get('API574_CS_400F', API574_CS_400F)
-                row = table.get(nps)
-                if row is None:
-                    return None
-                return row.get(pressure_class)
-            elif metallurgy in ("SS 316/316L", "SS 304/304L"):
-                table = pipe_data.get('API574_SS_400F', API574_SS_400F)
-                row = table.get(nps)
-                if row is None:
-                    return None
-                return row.get(pressure_class)
-            else:
-                return None
+        # API 574-2024 (and legacy "2025" alias): NPS-only minimum structural thickness
+        if API_table in ("2024", "2025"):
+            if metallurgy in (
+                "Intermediate/Low CS",
+                "SS 316/316L",
+                "SS 304/304L",
+            ):
+                table = pipe_data.get(
+                    "API574_NPS_STRUCTURAL_MIN",
+                    API574_NPS_STRUCTURAL_MIN,
+                )
+                return table.get(nps)
+            return None
 
         elif API_table == "2009":
             if metallurgy in ("Intermediate/Low CS",):

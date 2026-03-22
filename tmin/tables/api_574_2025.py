@@ -1,3 +1,5 @@
+# DEPRECATED: Structural tmin now uses API 574-2024 NPS-only table in api_574_2024.py.
+# This file is kept for reference only (legacy pressure-class matrices).
 
 # 2025 Edition varies significantly from the 2009 edition
 

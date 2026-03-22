@@ -17,6 +17,8 @@ TMIN can be used as a conservative and rapid engineering support tool for assess
 
 ### Install & run (Mac or Windows)
 
+**Don’t have Python or pip? (e.g. on a fresh PC)**
+
 1. **Install Python** (pip is included):
    - **Windows:** Download the installer from [python.org/downloads](https://www.python.org/downloads/) and run it. **Check the box “Add Python to PATH”** at the bottom, then finish the install.
    - **Mac:** Install from [python.org](https://www.python.org/downloads/) or run `brew install python3` if you use Homebrew.
@@ -40,6 +42,8 @@ cd tmin
 pip install .
 tmin
 ```
+
+Large API standard PDFs are **not** included in the repo (keeps clones small). You can drop your own copies under `references/` if you want them locally—see `references/README.md`.
 
 **Option B – Install directly from GitHub**
 

@@ -16,7 +16,7 @@ Date: [Date of generation]
 
 Background:
 
- - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment(pipe, vessel, nozzle, tank)] found a low remaining wall thickness ([TML number] at [Current thickness to date]") located near on [size] [subcomponent] due to [Internal/External] [EDD] corrosion. 
+ - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment(pipe, vessel, nozzle, tank)] found a low remaining wall thickness ([TML number] at [Current thickness to date]") located near/on a [size] [subcomponent] due to [Internal/External] [EDD] corrosion. 
 
  - Per Credo, the POF is currently a [current POF] and will progress to a [POF at outage timestamp] through [Unit] [Incoming Outage timestamp] outage opportunity. 
 
@@ -31,11 +31,11 @@ Component: [Size] [Circuit Fluid Service] [Type of Equipment(pipe, vessel, nozzl
 
 Design Pressure / Design Temperature: [Design Pressure] PSIG / [Design Temperature] F
 
+Operating Pressure / Operating Temperature: [Operating Pressure] PSIG / [Operating Temperature] F
+
 Nominal Thickness: [Nominal Thickness]"
 
 Lowest Thickness recorded to date: [current thickness]"
-
-Current Tmin on record: [Current tmin]"
 
 
 

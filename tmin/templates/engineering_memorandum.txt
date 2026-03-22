@@ -16,9 +16,9 @@ Date: [Date of generation]
 
 Background:
 
- - A [Inspection type] inspection driven by equipment strategy of [Type of Equipment] found a low remaining wall thickness ([TML number] at [Current thickness to date]) located near on [Size] [subcomponent] due to [Internal/External] [Degradation Mechanism] corrosion. 
+ - A [Inspection type] inspection driven by equipment strategy of [Pipe Circuit No.] [Type of Equipment] found a low remaining wall thickness ([TML number] at [Current thickness to date]) located near/on a [Size] [subcomponent] due to [Internal/External] [Degradation Mechanism]. 
 
- - [Pipe Circuit No.] [Type of Equipment] has a SHE-[SHE consequence level] of a [failure types] leading to a potential [Consequence type]. 
+ - [Pipe Circuit No.] [Type of Equipment] has a level [SHE consequence level] consequence of a [failure types] leading to a potential [Consequence type]. 
 
  - AR/T = 1 in [Date AR/T = 1].
 
@@ -29,11 +29,11 @@ Component: [Size] [Circuit Fluid Service] [Type of Equipment] [subcomponent]
 
 Design Pressure / Design Temperature: [Design Pressure] PSIG / [Design Temperature] F
 
+Operating Pressure / Operating Temperature: [Operating Pressure] PSIG / [Operating Temperature] F
+
 Nominal Thickness: [Nominal Thickness]"
 
 Lowest Thickness recorded to date: [current thickness]"
-
-Current Tmin on record: [Current tmin]"
 
 
 
@@ -43,17 +43,18 @@ Pressure tmin calculations:
 
   Inputs:
     P (design pressure)        = [calc_P] psi
+    Allowable stress basis:     [allowable stress basis]
     D (outer diameter)         = [calc_D] in
-    S (allowable stress)       = [calc_S] psi
+    S (allowable stress)       = [calc_S]
     E (joint efficiency)       = [calc_E]
     W (weld strength reduction)= [calc_W]
     Y (y-coefficient)          = [calc_Y]
 
   Pressure tmin              = [tmin_pressure] in
   Structural tmin ([struct_label]) = [tmin_structural] in
-  Governing tmin             = [governing_thickness] in ([governing_type])
   Current thickness          = [current thickness]"
   Corrosion allowance        = [corrosion_allowance] in
+  CA to PTmin                = [CA to PTmin] in
 
 
 
@@ -76,18 +77,38 @@ EDD: [Degradation Mechanism]
 
 Corrosion Rate: [CR] mpy ([CR description])
 
-Current Tmin: [Current tmin]"
 
+ESL Summary:
 
-General Notes:
+Based on the Inspection report data provided and EDD guidance, [AR/T progression] based on [AR/T Basis]. From the [UT_date display] [Inspection type] inspection, approx. [percent undamaged] add'l susceptible, [percent damaged] damaged. [Inspection Effectiveness] inspection effectiveness. [Number of RT per TML] shots per TML. Findings include >[percent CA consumed] CAC at [TML number] with [coating status] coating.
 
-  Allowable Stress Basis: [Allowable Stress Basis]
-  AR/T Basis: [AR/T Basis]
-  AR/T = 1 in [Date AR/T = 1]
-  Structural tmin ([struct_label]): [tmin_structural] in
-  Pressure tmin (ASME B31.3): [tmin_pressure] in
-  Current thickness reading: [current thickness]"
+[ESL conservative vs LTCR paragraph]
+
+From present date, the AR/T=1 is estimated to be [Present - AR/T] [ESL threshold compare] 2 years with no mitigations in place.
+
+Recommendation is to arrest or mitigate corrosion rate via [mitigation] until TML can be addressed for permanent repair/replacement. Assigning [ESL Evaluation].
 
 [General Notes]
+
+
+RBMP Notes:
+
+ - TML/Components: [TML number]
+ - Design Pressure: [design_pressure] PSIG
+ - Design temperature: [design_temp] F
+ - Operating Pressure: [operating pressure] PSIG
+ - Operating Temperature: [operating_temp] F
+ - Nominal Equipment: [nps]
+
+
+ - Nominal Wall thickness for piping specification: [nominal wall thickness piping] in
+ - PMG retirement thickness: [PMG retirement thickness] in
+ - API-574 recommended retirement thickness: [API 574 structural tmin] in
+ - Required thickness per B31.3 Calculations: [B31.3 required thickness] in
+ - Minimum Measured Thickness from Recent Inspection: [minimum measured thickness] in
+
+
+ - Mitigations: [Mitigations]
+ - SHE Consequence Level: [SHE Consequence Level]
 
 

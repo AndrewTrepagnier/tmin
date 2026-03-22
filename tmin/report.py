@@ -82,6 +82,8 @@ def main() -> None:
             "pressure_class": 150,
             "metallurgy": "Intermediate/Low CS",
             "allowable_stress": 23333,
+            "allowable_stress_code_year": "1966",
+            "allowable_stress_code_source": "B31.3 Allowables",
             "current_thickness": 0.112,
             "Site Name": "Example Site",
             "Fixed Equipment Department": "Fixed Equipment",
@@ -108,6 +110,7 @@ def main() -> None:
             "CR description": "General",
             "ESL Evaluation": "Acceptable to next outage",
             "AR/T Basis": "Calculated from inspection data",
+            "AR/T progression": "Fill in by user",
             "General Notes": "",
         }
         inst = TMIN(example)
